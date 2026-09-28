@@ -140,6 +140,7 @@ export const siteSettingsSchema = z.object({
   siteDescription: z.string().min(1, "Site description is required"),
   contactEmail: z.string().email("Invalid contact email"),
   footerText: z.string().nullable().optional(),
+  theme: z.string().optional().default("cream-terracotta"),
   enableNews: z.boolean().default(true),
   enableStudents: z.boolean().default(true),
 });

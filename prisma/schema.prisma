@@ -209,6 +209,7 @@ model SiteSettings {
   siteDescription String   @default("Academic Portfolio and Research Group of Dr. Abhishek Rajput at Indian Institute of Technology Indore.")
   contactEmail    String   @default("abhishekrajput@iiti.ac.in")
   footerText      String?
+  theme           String   @default("cream-terracotta")
   enableNews      Boolean  @default(true)
   enableStudents  Boolean  @default(true)
   updatedAt       DateTime @updatedAt

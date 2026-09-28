@@ -9,6 +9,18 @@
   --primary-academic: #0f172a;
   --accent-academic: #047857;
   --text-muted: #64748b;
+
+  /* Dynamic Academic Theme Tokens (Defaults to Warm Cream & Terracotta) */
+  --bg-canvas: #faf7f2;
+  --bg-card: #ffffff;
+  --bg-subtle: #f3ede3;
+  --text-main: #2c2b29;
+  --accent-primary: #8a4b2d;
+  --accent-hover: #723c22;
+  --accent-subtle: rgba(138, 75, 45, 0.08);
+  --badge-bg: rgba(138, 75, 45, 0.1);
+  --badge-text: #8a4b2d;
+  --font-heading: Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
 body {
@@ -17,6 +29,98 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Public Academic Portal Theme Root & Cascading Rules */
+.public-theme-root {
+  background-color: var(--bg-canvas) !important;
+  color: var(--text-main) !important;
+}
+
+.public-theme-root h1,
+.public-theme-root h2,
+.public-theme-root h3,
+.public-theme-root h4,
+.public-theme-root .academic-heading {
+  font-family: var(--font-heading);
+}
+
+.public-theme-root .hero-wrapper {
+  background: linear-gradient(180deg, var(--bg-subtle) 0%, var(--bg-canvas) 100%) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+.public-theme-root header.sticky {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
+}
+
+.public-theme-root .theme-surface,
+.public-theme-root section.bg-white,
+.public-theme-root article.bg-white,
+.public-theme-root div.bg-white {
+  background-color: var(--bg-card);
+  border-color: var(--border-color);
+}
+
+.public-theme-root .border-slate-200,
+.public-theme-root .border-slate-200\/90,
+.public-theme-root .border-slate-200\/80,
+.public-theme-root .border-slate-100 {
+  border-color: var(--border-color);
+}
+
+.public-theme-root .text-slate-900 {
+  color: var(--text-main);
+}
+
+.public-theme-root .text-slate-700 {
+  color: var(--text-main);
+  opacity: 0.92;
+}
+
+.public-theme-root .text-slate-600,
+.public-theme-root .text-slate-500 {
+  color: var(--text-muted);
+}
+
+.public-theme-root .text-emerald-800,
+.public-theme-root .text-emerald-700,
+.public-theme-root .theme-accent-text {
+  color: var(--accent-primary) !important;
+}
+
+.public-theme-root .hover\:text-emerald-950:hover,
+.public-theme-root .hover\:text-emerald-800:hover,
+.public-theme-root .hover\:text-emerald-700:hover {
+  color: var(--accent-hover) !important;
+}
+
+.public-theme-root .bg-emerald-800,
+.public-theme-root .bg-emerald-700,
+.public-theme-root .theme-accent-bg {
+  background-color: var(--accent-primary) !important;
+}
+
+.public-theme-root .hover\:bg-emerald-700:hover,
+.public-theme-root .hover\:bg-emerald-800:hover {
+  background-color: var(--accent-hover) !important;
+}
+
+.public-theme-root .bg-emerald-50,
+.public-theme-root .theme-badge {
+  background-color: var(--badge-bg) !important;
+  color: var(--badge-text) !important;
+  border-color: var(--accent-subtle) !important;
+}
+
+.public-theme-root .hero-primary-btn {
+  background-color: var(--accent-primary) !important;
+  color: #ffffff !important;
+}
+
+.public-theme-root .hero-primary-btn:hover {
+  background-color: var(--accent-hover) !important;
 }
 
 /* Subtle typography enhancements */

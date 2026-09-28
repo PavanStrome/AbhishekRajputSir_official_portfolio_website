@@ -31,6 +31,7 @@ export async function PUT(req: NextRequest) {
       siteDescription,
       contactEmail,
       footerText,
+      theme,
       enableNews,
       enableStudents,
       adminName,
@@ -45,6 +46,7 @@ export async function PUT(req: NextRequest) {
       siteDescription,
       contactEmail,
       footerText,
+      theme,
       enableNews,
       enableStudents,
     });

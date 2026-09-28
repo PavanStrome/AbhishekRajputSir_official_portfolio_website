@@ -33,7 +33,7 @@ export default function Hero({
     : [];
 
   return (
-    <section className="relative bg-gradient-to-b from-slate-50 to-white border-b border-slate-200/80 pt-10 pb-16 lg:py-20">
+    <section className="relative hero-wrapper pt-10 pb-16 lg:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Professor Portrait / Image (Column 1) */}
@@ -119,7 +119,7 @@ export default function Hero({
             <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-3">
               <Link
                 href="/research"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-lg shadow-sm hover:shadow transition-all"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-lg shadow-sm hover:shadow transition-all hero-primary-btn"
               >
                 <span>Explore Research</span>
                 <ArrowRight className="w-4 h-4" />
