@@ -18,6 +18,7 @@ import {
   Pin,
   Eye,
   Type,
+  Layers,
 } from "lucide-react";
 import {
   ACADEMIC_THEMES,
@@ -42,8 +43,10 @@ export default function AdminSettingsPage() {
   const [selectedTheme, setSelectedTheme] = useState<string>(DEFAULT_THEME_ID);
   const [selectedFont, setSelectedFont] = useState<string>(DEFAULT_FONT_STYLE_ID);
   const [themeFilter, setThemeFilter] = useState<string>("all");
+  const [fontFilter, setFontFilter] = useState<string>("all");
   const [applyingTheme, setApplyingTheme] = useState(false);
   const [applyingFont, setApplyingFont] = useState(false);
+  const [savingCombination, setSavingCombination] = useState(false);
 
   const [adminName, setAdminName] = useState("");
   const [adminEmail, setAdminEmail] = useState("");
@@ -74,6 +77,7 @@ export default function AdminSettingsPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  // 1-Click Apply for Color Theme (preserves current font style)
   const applyThemeDirectly = async (themeId: string) => {
     setSelectedTheme(themeId);
     setApplyingTheme(true);
@@ -94,9 +98,10 @@ export default function AdminSettingsPage() {
 
       setSettings((prev: any) => ({ ...prev, theme: themeId }));
       const themeObj = ACADEMIC_THEMES[themeId];
+      const fontObj = ACADEMIC_FONT_STYLES[selectedFont];
       setFeedback({
         type: "success",
-        text: `🎨 Color palette "${themeObj?.name || themeId}" applied live! The entire public portal has been instantly updated.`,
+        text: `🎨 Color palette "${themeObj?.name || themeId}" applied live! Paired with "${fontObj?.name}". The entire public portal has been instantly updated.`,
       });
     } catch (err: any) {
       setFeedback({ type: "error", text: err.message || "Failed to apply theme" });
@@ -105,6 +110,7 @@ export default function AdminSettingsPage() {
     }
   };
 
+  // 1-Click Apply for Font Style (preserves current color theme)
   const applyFontDirectly = async (fontId: string) => {
     setSelectedFont(fontId);
     setApplyingFont(true);
@@ -125,14 +131,47 @@ export default function AdminSettingsPage() {
 
       setSettings((prev: any) => ({ ...prev, fontStyle: fontId }));
       const fontObj = ACADEMIC_FONT_STYLES[fontId];
+      const themeObj = ACADEMIC_THEMES[selectedTheme];
       setFeedback({
         type: "success",
-        text: `🔤 Typography style "${fontObj?.name || fontId}" applied live! The entire public portal has been instantly updated.`,
+        text: `🔤 Typography style "${fontObj?.name || fontId}" applied live! Paired with palette "${themeObj?.name}". The entire public portal has been instantly updated.`,
       });
     } catch (err: any) {
       setFeedback({ type: "error", text: err.message || "Failed to apply font style" });
     } finally {
       setApplyingFont(false);
+    }
+  };
+
+  // Apply Selected Combination (Both Theme + Font)
+  const applyBothDirectly = async () => {
+    setSavingCombination(true);
+    setFeedback(null);
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...settings,
+          theme: selectedTheme,
+          fontStyle: selectedFont,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to update combination");
+
+      setSettings((prev: any) => ({ ...prev, theme: selectedTheme, fontStyle: selectedFont }));
+      const themeObj = ACADEMIC_THEMES[selectedTheme];
+      const fontObj = ACADEMIC_FONT_STYLES[selectedFont];
+      setFeedback({
+        type: "success",
+        text: `✨ Combination applied live: [${themeObj?.name}] + [${fontObj?.name}]! The entire public portal has been updated.`,
+      });
+    } catch (err: any) {
+      setFeedback({ type: "error", text: err.message || "Failed to apply combination" });
+    } finally {
+      setSavingCombination(false);
     }
   };
 
@@ -203,6 +242,12 @@ export default function AdminSettingsPage() {
     return t.category === themeFilter;
   });
 
+  const fontList = Object.values(ACADEMIC_FONT_STYLES);
+  const filteredFonts = fontList.filter((f) => {
+    if (fontFilter === "all") return true;
+    return f.category === fontFilter;
+  });
+
   const activeThemeObj = ACADEMIC_THEMES[selectedTheme] || ACADEMIC_THEMES[DEFAULT_THEME_ID];
   const activeFontObj = ACADEMIC_FONT_STYLES[selectedFont] || ACADEMIC_FONT_STYLES[DEFAULT_FONT_STYLE_ID];
 
@@ -210,7 +255,7 @@ export default function AdminSettingsPage() {
     <div className="flex-1 flex flex-col min-w-0">
       <AdminHeader
         title="Website Settings & Appearance"
-        subtitle="Manage website visual design theme (18 academic palettes), typography font styles (6 curated pairings), and administrator security."
+        subtitle="Manage website visual appearance (18 academic color themes × 6 font pairings = 108 combinations), general site attributes, and administrator security."
       />
 
       <div className="p-6 sm:p-8 space-y-8 max-w-5xl">
@@ -231,104 +276,91 @@ export default function AdminSettingsPage() {
           </div>
         )}
 
-        {/* 1. Theme & Appearance Section */}
+        {/* Master Combination Status Banner */}
+        <div className="p-5 rounded-2xl border-2 border-emerald-600/70 bg-emerald-50/50 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-start sm:items-center gap-3">
+            <span className="p-2.5 rounded-xl bg-emerald-700 text-white shadow-xs shrink-0">
+              <Sparkles className="w-5 h-5" />
+            </span>
+            <div>
+              <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-900">
+                Active Website Combination (Live for Viewers)
+              </div>
+              <div className="flex items-center gap-2 flex-wrap mt-0.5">
+                <span className="font-extrabold text-sm text-slate-900 flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-lg border border-emerald-200 shadow-2xs">
+                  <Palette className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>{activeThemeObj.name}</span>
+                </span>
+                <span className="text-slate-400 font-bold text-sm">+</span>
+                <span
+                  className="font-extrabold text-sm text-slate-900 flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-lg border border-emerald-200 shadow-2xs"
+                  style={{ fontFamily: activeFontObj.headingFont }}
+                >
+                  <Type className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>{activeFontObj.name}</span>
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-600 mt-1">
+                Any color palette can be mixed and matched with any font style. You can click cards in either section to apply them in any combination!
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={applyBothDirectly}
+              disabled={savingCombination}
+              className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs shadow-xs transition-colors flex items-center gap-2 disabled:opacity-50"
+            >
+              {savingCombination ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <CheckCircle className="w-3.5 h-3.5" />
+              )}
+              <span>Apply Combination Live</span>
+            </button>
+
+            <Link
+              href="/design-preview"
+              target="_blank"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors shadow-2xs"
+            >
+              <Eye className="w-3.5 h-3.5 text-slate-500" />
+              <span>Live Preview</span>
+              <ExternalLink className="w-3 h-3 text-slate-400" />
+            </Link>
+          </div>
+        </div>
+
+        {/* 1. Theme & Color Palette Section */}
         <div className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-2xs space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <Palette className="w-5 h-5 text-emerald-700" />
                 <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">
-                  Website Theme & Color Palette (1-Click Instant Change)
+                  Section 1: Website Theme & Color Palette (18 Academic Designs)
                 </h2>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                  18 Handcrafted Designs
+                  18 Palettes
                 </span>
               </div>
               <p className="text-slate-500 text-xs">
-                Select from 18 curated academic themes. Single-click any card to apply it live to the entire public website.
+                Select from 18 academic color themes (Warm Archival papers, Prestigious Universities, Modern Minimalist, Nature, and Dark Modes).
               </p>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
-              <Link
-                href="/design-preview"
-                target="_blank"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-colors"
-              >
-                <Eye className="w-3.5 h-3.5 text-slate-500" />
-                <span>Side-by-Side Preview</span>
-                <ExternalLink className="w-3 h-3 text-slate-400" />
-              </Link>
-              <Link
-                href="/"
-                target="_blank"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold transition-colors"
-              >
-                <span>View Public Site</span>
-                <ExternalLink className="w-3 h-3 text-emerald-600" />
-              </Link>
+            <div className="p-2.5 rounded-lg border border-slate-200 bg-slate-50 flex items-center gap-2 text-xs shrink-0">
+              <span className="text-slate-500 font-medium">Active Color Palette:</span>
+              <span className="font-bold text-slate-900">{activeThemeObj.name}</span>
             </div>
           </div>
 
-          {/* Active Theme Status Strip */}
-          <div className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/70 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center -space-x-1.5 shrink-0">
-                <div
-                  className="w-7 h-7 rounded-full border-2 border-white shadow-xs"
-                  style={{ backgroundColor: activeThemeObj.swatch.canvas }}
-                  title="Canvas background"
-                />
-                <div
-                  className="w-7 h-7 rounded-full border-2 border-white shadow-xs"
-                  style={{ backgroundColor: activeThemeObj.swatch.card }}
-                  title="Card background"
-                />
-                <div
-                  className="w-7 h-7 rounded-full border-2 border-white shadow-xs"
-                  style={{ backgroundColor: activeThemeObj.swatch.accent }}
-                  title="Accent color"
-                />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-slate-900">
-                    Active Palette: {activeThemeObj.name}
-                  </span>
-                  {activeThemeObj.isPinned && (
-                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-200">
-                      Pinned
-                    </span>
-                  )}
-                  <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-200 text-slate-700">
-                    {activeThemeObj.category}
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-500">
-                  {activeThemeObj.description}
-                </p>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => applyThemeDirectly(selectedTheme)}
-              disabled={applyingTheme}
-              className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs shadow-xs transition-colors flex items-center gap-2 shrink-0 disabled:opacity-50"
-            >
-              {applyingTheme ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <Sparkles className="w-3.5 h-3.5" />
-              )}
-              <span>Apply Palette Instantly</span>
-            </button>
-          </div>
-
-          {/* Category Filter Pills */}
+          {/* Theme Category Filter Pills */}
           <div className="flex flex-wrap gap-1.5 pt-1">
             {[
-              { id: "all", label: `All Themes (${themeList.length})` },
+              { id: "all", label: `All Palettes (${themeList.length})` },
               { id: "pinned", label: "📌 Pinned Favorites (2)" },
               { id: "Archival & Editorial", label: "Archival & Editorial (4)" },
               { id: "Prestigious Universities", label: "Prestigious Universities (4)" },
@@ -459,28 +491,51 @@ export default function AdminSettingsPage() {
               <div className="flex items-center gap-2">
                 <Type className="w-5 h-5 text-emerald-700" />
                 <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">
-                  Typography & Academic Font Pairings (6 Curated Styles)
+                  Section 2: Typography & Font Style (6 Curated Academic Pairings)
                 </h2>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
                   Google Academic Fonts
                 </span>
               </div>
               <p className="text-slate-500 text-xs">
-                Pair any color theme with 6 distinguished font styles (Classical Oxford, Bodleian Roman, Modern Literary Journal, MIT Neo-Grotesque, etc.).
+                Select your preferred font pairing. You can combine ANY font style with ANY color palette above.
               </p>
             </div>
 
             <div className="p-2.5 rounded-lg border border-slate-200 bg-slate-50 flex items-center gap-2 text-xs shrink-0">
               <span className="text-slate-500 font-medium">Active Typography:</span>
-              <span className="font-bold text-slate-900">
+              <span className="font-bold text-slate-900" style={{ fontFamily: activeFontObj.headingFont }}>
                 {activeFontObj.name}
               </span>
             </div>
           </div>
 
+          {/* Font Category Filter Pills */}
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {[
+              { id: "all", label: `All Fonts (${fontList.length})` },
+              { id: "Classical Serif", label: "🏛️ Classical Serif (3)" },
+              { id: "Contemporary Serif", label: "📰 Contemporary Serif (1)" },
+              { id: "Modern Technical Sans", label: "⚡ Modern Technical Sans (2)" },
+            ].map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => setFontFilter(f.id)}
+                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                  fontFilter === f.id
+                    ? "bg-slate-900 text-white shadow-xs"
+                    : "bg-slate-100 hover:bg-slate-200 text-slate-700"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+
           {/* Font Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.values(ACADEMIC_FONT_STYLES).map((f) => {
+            {filteredFonts.map((f) => {
               const isSelected = selectedFont === f.id;
               return (
                 <div
@@ -510,7 +565,10 @@ export default function AdminSettingsPage() {
 
                     {/* Font Name */}
                     <div>
-                      <h3 className="font-bold text-sm text-slate-900 leading-tight">
+                      <h3
+                        className="font-bold text-base text-slate-900 leading-tight"
+                        style={{ fontFamily: f.headingFont }}
+                      >
                         {f.name}
                       </h3>
                       <span className="text-[10px] font-semibold text-emerald-800">
@@ -536,7 +594,7 @@ export default function AdminSettingsPage() {
                         className="text-[11px] text-slate-500 pt-1 border-t border-slate-200/60"
                         style={{ fontFamily: f.bodyFont }}
                       >
-                        Sample body text: Ballistic penetration & high-rate material characterization.
+                        Sample body: Ballistic penetration & extreme dynamic loading research.
                       </div>
                     </div>
 
