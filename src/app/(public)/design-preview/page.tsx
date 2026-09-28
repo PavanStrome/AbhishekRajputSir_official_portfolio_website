@@ -21,16 +21,26 @@ import {
   CheckCircle,
   AlertCircle,
   Loader2,
+  Type,
 } from "lucide-react";
-import { ACADEMIC_THEMES, DEFAULT_THEME_ID, ThemeDefinition } from "@/lib/themes";
+import {
+  ACADEMIC_THEMES,
+  DEFAULT_THEME_ID,
+  ACADEMIC_FONT_STYLES,
+  DEFAULT_FONT_STYLE_ID,
+  getFontStyle,
+} from "@/lib/themes";
 
 export default function DesignPreviewPage() {
   const [selectedThemeId, setSelectedThemeId] = useState<string>(DEFAULT_THEME_ID);
+  const [selectedFontId, setSelectedFontId] = useState<string>(DEFAULT_FONT_STYLE_ID);
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [applying, setApplying] = useState(false);
   const [saveStatus, setSaveStatus] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const themeList = Object.values(ACADEMIC_THEMES);
+  const fontList = Object.values(ACADEMIC_FONT_STYLES);
+
   const filteredThemes = themeList.filter((t) => {
     if (categoryFilter === "all") return true;
     if (categoryFilter === "pinned") return t.isPinned;
@@ -38,13 +48,13 @@ export default function DesignPreviewPage() {
   });
 
   const activeTheme = ACADEMIC_THEMES[selectedThemeId] || ACADEMIC_THEMES[DEFAULT_THEME_ID];
-  const { cssVars, fontHeading } = activeTheme;
+  const activeFont = getFontStyle(selectedFontId);
+  const { cssVars } = activeTheme;
 
   const handleApplyToLiveSite = async () => {
     setApplying(true);
     setSaveStatus(null);
     try {
-      // First fetch current settings to preserve them
       const getRes = await fetch("/api/admin/settings");
       if (!getRes.ok) {
         throw new Error("Please log in to the Faculty Admin CMS to apply changes directly.");
@@ -58,22 +68,23 @@ export default function DesignPreviewPage() {
         body: JSON.stringify({
           ...currentSettings,
           theme: selectedThemeId,
+          fontStyle: selectedFontId,
         }),
       });
 
       const putData = await putRes.json();
       if (!putRes.ok) {
-        throw new Error(putData.error || "Failed to update website theme.");
+        throw new Error(putData.error || "Failed to update website appearance.");
       }
 
       setSaveStatus({
         type: "success",
-        text: `Design "${activeTheme.name}" is now LIVE on the public website!`,
+        text: `Design "${activeTheme.name}" + Typography "${activeFont.name}" are now LIVE on the public website!`,
       });
     } catch (err: any) {
       setSaveStatus({
         type: "error",
-        text: err.message || "Could not save theme. Make sure you are logged in to /admin.",
+        text: err.message || "Could not save settings. Make sure you are logged in to /admin.",
       });
     } finally {
       setApplying(false);
@@ -84,7 +95,7 @@ export default function DesignPreviewPage() {
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans">
       {/* Top Controller Bar */}
       <div className="sticky top-0 z-50 bg-slate-950/95 backdrop-blur-md border-b border-slate-800 shadow-xl">
-        <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6">
+        <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 space-y-3">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
@@ -92,14 +103,14 @@ export default function DesignPreviewPage() {
                   <Sliders className="w-4 h-4" />
                 </span>
                 <h1 className="text-sm sm:text-base font-bold text-white tracking-tight">
-                  Academic Design Explorer (18 Themes)
+                  Academic Design Explorer (18 Themes × 6 Font Pairings)
                 </h1>
                 <span className="hidden sm:inline px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">
-                  Live Preview
+                  108 Live Combinations
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
-                Click any palette below to preview instantly. Test archival papers, Ivy League tones, modern minimalists, or dark modes.
+                Toggle through 18 color palettes and 6 prestigious typography styles in real time below.
               </p>
             </div>
 
@@ -131,7 +142,7 @@ export default function DesignPreviewPage() {
           {/* Feedback Banner */}
           {saveStatus && (
             <div
-              className={`mt-2 p-2.5 rounded-lg text-xs font-semibold flex items-center gap-2 ${
+              className={`p-2.5 rounded-lg text-xs font-semibold flex items-center gap-2 ${
                 saveStatus.type === "success"
                   ? "bg-emerald-950/80 text-emerald-200 border border-emerald-700"
                   : "bg-rose-950/80 text-rose-200 border border-rose-700"
@@ -146,10 +157,34 @@ export default function DesignPreviewPage() {
             </div>
           )}
 
+          {/* Typography Selector Pills */}
+          <div className="flex items-center gap-2 overflow-x-auto pt-1 pb-1 no-scrollbar text-xs">
+            <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1 shrink-0 uppercase tracking-wider">
+              <Type className="w-3 h-3 text-emerald-400" />
+              <span>Fonts:</span>
+            </span>
+            {fontList.map((f) => {
+              const isSelected = selectedFontId === f.id;
+              return (
+                <button
+                  key={f.id}
+                  onClick={() => setSelectedFontId(f.id)}
+                  className={`px-2.5 py-1 rounded-md text-xs font-semibold shrink-0 transition-all border ${
+                    isSelected
+                      ? "bg-emerald-600 text-white border-emerald-500 shadow-xs"
+                      : "bg-slate-900 border-slate-800 hover:border-slate-700 text-slate-300"
+                  }`}
+                >
+                  <span style={{ fontFamily: f.headingFont }}>{f.name}</span>
+                </button>
+              );
+            })}
+          </div>
+
           {/* Category Tabs */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pt-3 pb-1 no-scrollbar text-xs">
+          <div className="flex items-center gap-1.5 overflow-x-auto pt-1 pb-1 no-scrollbar text-xs border-t border-slate-800/80">
             {[
-              { id: "all", label: `All (18)` },
+              { id: "all", label: `All Palettes (18)` },
               { id: "pinned", label: "📌 Pinned (2)" },
               { id: "Archival & Editorial", label: "Archival (4)" },
               { id: "Prestigious Universities", label: "Universities (4)" },
@@ -160,10 +195,10 @@ export default function DesignPreviewPage() {
               <button
                 key={cat.id}
                 onClick={() => setCategoryFilter(cat.id)}
-                className={`px-2.5 py-1 rounded-md font-semibold text-xs transition-colors shrink-0 ${
+                className={`px-2.5 py-0.5 rounded-md font-semibold text-[11px] transition-colors shrink-0 ${
                   categoryFilter === cat.id
                     ? "bg-slate-200 text-slate-900"
-                    : "bg-slate-800/80 hover:bg-slate-800 text-slate-300"
+                    : "bg-slate-800/80 hover:bg-slate-800 text-slate-400"
                 }`}
               >
                 {cat.label}
@@ -172,7 +207,7 @@ export default function DesignPreviewPage() {
           </div>
 
           {/* Theme Horizontal Selector */}
-          <div className="flex items-center gap-2 overflow-x-auto py-2.5 no-scrollbar">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
             {filteredThemes.map((t) => {
               const isSelected = selectedThemeId === t.id;
               return (
@@ -214,10 +249,7 @@ export default function DesignPreviewPage() {
         style={{
           backgroundColor: cssVars.bgCanvas,
           color: cssVars.textMain,
-          fontFamily:
-            fontHeading === "serif"
-              ? 'Georgia, Cambria, "Times New Roman", Times, serif'
-              : 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          fontFamily: activeFont.bodyFont,
         }}
       >
         {/* Academic Sub-header Bar */}
@@ -230,7 +262,10 @@ export default function DesignPreviewPage() {
           }}
         >
           <div className="max-w-6xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-2 font-serif text-[11px] sm:text-xs">
+            <div
+              className="flex items-center gap-2 text-[11px] sm:text-xs"
+              style={{ fontFamily: activeFont.headingFont }}
+            >
               <span className="font-bold tracking-wider uppercase">
                 Indian Institute of Technology Indore
               </span>
@@ -238,8 +273,11 @@ export default function DesignPreviewPage() {
               <span className="hidden sm:inline">Department of Civil Engineering</span>
             </div>
             <div className="flex items-center gap-3 text-[11px]">
-              <span className="font-sans px-2 py-0.5 rounded border" style={{ borderColor: cssVars.borderColor, backgroundColor: cssVars.bgCard }}>
+              <span className="px-2 py-0.5 rounded border" style={{ borderColor: cssVars.borderColor, backgroundColor: cssVars.bgCard }}>
                 {activeTheme.name}
+              </span>
+              <span className="px-2 py-0.5 rounded border" style={{ borderColor: cssVars.borderColor, backgroundColor: cssVars.bgCard, fontFamily: activeFont.headingFont }}>
+                {activeFont.name}
               </span>
             </div>
           </div>
@@ -257,7 +295,7 @@ export default function DesignPreviewPage() {
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
               <div className="md:col-span-8 space-y-4">
                 <div
-                  className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-sans font-semibold border"
+                  className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold border"
                   style={{
                     backgroundColor: cssVars.badgeBg,
                     color: cssVars.badgeText,
@@ -270,26 +308,26 @@ export default function DesignPreviewPage() {
 
                 <h1
                   className="text-3xl sm:text-5xl font-extrabold tracking-tight"
-                  style={{ color: cssVars.textMain }}
+                  style={{ color: cssVars.textMain, fontFamily: activeFont.headingFont }}
                 >
                   Dr. Abhishek Rajput
                 </h1>
 
                 <p
                   className="text-lg sm:text-xl font-medium"
-                  style={{ color: cssVars.accentPrimary }}
+                  style={{ color: cssVars.accentPrimary, fontFamily: activeFont.headingFont }}
                 >
                   Assistant Professor in Civil Engineering
                 </p>
 
                 <p
                   className="text-sm sm:text-base leading-relaxed max-w-2xl"
-                  style={{ color: cssVars.textMuted }}
+                  style={{ color: cssVars.textMuted, fontFamily: activeFont.bodyFont }}
                 >
                   Investigating structural impact mechanics, ballistic penetration of concrete and metallic targets, high-rate material characterization, and crashworthiness in protective civil and marine infrastructure.
                 </p>
 
-                <div className="pt-2 flex flex-wrap items-center gap-3 font-sans text-xs">
+                <div className="pt-2 flex flex-wrap items-center gap-3 text-xs">
                   <button
                     type="button"
                     className="px-5 py-2.5 rounded-lg font-bold text-white shadow-sm flex items-center gap-2 transition-all hover:opacity-90"
@@ -331,7 +369,7 @@ export default function DesignPreviewPage() {
                 </div>
                 <div
                   className="mt-3 text-xs italic text-center"
-                  style={{ color: cssVars.textMuted }}
+                  style={{ color: cssVars.textMuted, fontFamily: activeFont.headingFont }}
                 >
                   Ph.D. IIT Roorkee • Postdoc PNU South Korea
                 </div>
@@ -340,7 +378,7 @@ export default function DesignPreviewPage() {
           </div>
         </section>
 
-        {/* Content Preview Grid: Research Thrusts & Publications */}
+        {/* Content Preview Grid */}
         <div className="max-w-6xl mx-auto px-4 sm:px-8 py-14 space-y-12">
           {/* Research Thrusts */}
           <section className="space-y-6">
@@ -350,20 +388,20 @@ export default function DesignPreviewPage() {
             >
               <div>
                 <span
-                  className="text-xs uppercase font-bold tracking-wider font-sans block"
+                  className="text-xs uppercase font-bold tracking-wider block"
                   style={{ color: cssVars.accentPrimary }}
                 >
                   Laboratory Research Focus
                 </span>
                 <h2
                   className="text-2xl sm:text-3xl font-bold tracking-tight mt-1"
-                  style={{ color: cssVars.textMain }}
+                  style={{ color: cssVars.textMain, fontFamily: activeFont.headingFont }}
                 >
                   Core Research Thrusts
                 </h2>
               </div>
               <span
-                className="text-xs font-sans font-semibold flex items-center gap-1"
+                className="text-xs font-semibold flex items-center gap-1"
                 style={{ color: cssVars.accentPrimary }}
               >
                 <span>4 Active Thrusts</span>
@@ -371,7 +409,7 @@ export default function DesignPreviewPage() {
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 font-sans">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {[
                 {
                   title: "Structural Impact & Ballistic Penetration",
@@ -414,13 +452,13 @@ export default function DesignPreviewPage() {
                   </div>
                   <h3
                     className="font-bold text-base tracking-tight"
-                    style={{ color: cssVars.textMain }}
+                    style={{ color: cssVars.textMain, fontFamily: activeFont.headingFont }}
                   >
                     {area.title}
                   </h3>
                   <p
                     className="text-xs leading-relaxed"
-                    style={{ color: cssVars.textMuted }}
+                    style={{ color: cssVars.textMuted, fontFamily: activeFont.bodyFont }}
                   >
                     {area.desc}
                   </p>
@@ -437,20 +475,20 @@ export default function DesignPreviewPage() {
             >
               <div>
                 <span
-                  className="text-xs uppercase font-bold tracking-wider font-sans block"
+                  className="text-xs uppercase font-bold tracking-wider block"
                   style={{ color: cssVars.accentPrimary }}
                 >
                   Scholarly Works
                 </span>
                 <h2
                   className="text-2xl sm:text-3xl font-bold tracking-tight mt-1"
-                  style={{ color: cssVars.textMain }}
+                  style={{ color: cssVars.textMain, fontFamily: activeFont.headingFont }}
                 >
                   Featured Peer-Reviewed Publications
                 </h2>
               </div>
               <span
-                className="text-xs font-sans font-semibold flex items-center gap-1"
+                className="text-xs font-semibold flex items-center gap-1"
                 style={{ color: cssVars.accentPrimary }}
               >
                 <span>View All 7 Publications</span>
@@ -458,7 +496,7 @@ export default function DesignPreviewPage() {
               </span>
             </div>
 
-            <div className="space-y-4 font-sans">
+            <div className="space-y-4">
               {[
                 {
                   year: 2024,
@@ -514,12 +552,12 @@ export default function DesignPreviewPage() {
 
                   <h3
                     className="font-bold text-sm sm:text-base leading-snug"
-                    style={{ color: cssVars.textMain }}
+                    style={{ color: cssVars.textMain, fontFamily: activeFont.headingFont }}
                   >
                     {pub.title}
                   </h3>
 
-                  <p className="text-xs" style={{ color: cssVars.textMuted }}>
+                  <p className="text-xs" style={{ color: cssVars.textMuted, fontFamily: activeFont.bodyFont }}>
                     {pub.authors} • <em style={{ color: cssVars.accentPrimary }}>{pub.journal}</em>
                   </p>
                 </div>
@@ -530,7 +568,7 @@ export default function DesignPreviewPage() {
 
         {/* Footer */}
         <footer
-          className="border-t py-12 px-4 sm:px-8 text-xs font-sans"
+          className="border-t py-12 px-4 sm:px-8 text-xs"
           style={{
             backgroundColor: cssVars.bgSubtle,
             borderColor: cssVars.borderColor,
@@ -539,10 +577,10 @@ export default function DesignPreviewPage() {
         >
           <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
-              <span className="font-bold block" style={{ color: cssVars.textMain }}>
+              <span className="font-bold block" style={{ color: cssVars.textMain, fontFamily: activeFont.headingFont }}>
                 Dr. Abhishek Rajput
               </span>
-              <span>
+              <span style={{ fontFamily: activeFont.bodyFont }}>
                 Department of Civil Engineering, Indian Institute of Technology Indore
               </span>
             </div>

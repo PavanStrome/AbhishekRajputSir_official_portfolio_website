@@ -17,8 +17,14 @@ import {
   Sparkles,
   Pin,
   Eye,
+  Type,
 } from "lucide-react";
-import { ACADEMIC_THEMES, DEFAULT_THEME_ID } from "@/lib/themes";
+import {
+  ACADEMIC_THEMES,
+  DEFAULT_THEME_ID,
+  ACADEMIC_FONT_STYLES,
+  DEFAULT_FONT_STYLE_ID,
+} from "@/lib/themes";
 import Link from "next/link";
 
 export default function AdminSettingsPage() {
@@ -28,13 +34,16 @@ export default function AdminSettingsPage() {
     contactEmail: "",
     footerText: "",
     theme: DEFAULT_THEME_ID,
+    fontStyle: DEFAULT_FONT_STYLE_ID,
     enableNews: true,
     enableStudents: true,
   });
 
   const [selectedTheme, setSelectedTheme] = useState<string>(DEFAULT_THEME_ID);
+  const [selectedFont, setSelectedFont] = useState<string>(DEFAULT_FONT_STYLE_ID);
   const [themeFilter, setThemeFilter] = useState<string>("all");
   const [applyingTheme, setApplyingTheme] = useState(false);
+  const [applyingFont, setApplyingFont] = useState(false);
 
   const [adminName, setAdminName] = useState("");
   const [adminEmail, setAdminEmail] = useState("");
@@ -55,6 +64,9 @@ export default function AdminSettingsPage() {
           if (d.settings.theme) {
             setSelectedTheme(d.settings.theme);
           }
+          if (d.settings.fontStyle) {
+            setSelectedFont(d.settings.fontStyle);
+          }
         }
         if (d.adminEmail) setAdminEmail(d.adminEmail);
         if (d.adminName) setAdminName(d.adminName);
@@ -73,6 +85,7 @@ export default function AdminSettingsPage() {
         body: JSON.stringify({
           ...settings,
           theme: themeId,
+          fontStyle: selectedFont,
         }),
       });
 
@@ -83,12 +96,43 @@ export default function AdminSettingsPage() {
       const themeObj = ACADEMIC_THEMES[themeId];
       setFeedback({
         type: "success",
-        text: `🎨 Design "${themeObj?.name || themeId}" applied live! The entire public portal has been instantly updated.`,
+        text: `🎨 Color palette "${themeObj?.name || themeId}" applied live! The entire public portal has been instantly updated.`,
       });
     } catch (err: any) {
       setFeedback({ type: "error", text: err.message || "Failed to apply theme" });
     } finally {
       setApplyingTheme(false);
+    }
+  };
+
+  const applyFontDirectly = async (fontId: string) => {
+    setSelectedFont(fontId);
+    setApplyingFont(true);
+    setFeedback(null);
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...settings,
+          theme: selectedTheme,
+          fontStyle: fontId,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to update font style");
+
+      setSettings((prev: any) => ({ ...prev, fontStyle: fontId }));
+      const fontObj = ACADEMIC_FONT_STYLES[fontId];
+      setFeedback({
+        type: "success",
+        text: `🔤 Typography style "${fontObj?.name || fontId}" applied live! The entire public portal has been instantly updated.`,
+      });
+    } catch (err: any) {
+      setFeedback({ type: "error", text: err.message || "Failed to apply font style" });
+    } finally {
+      setApplyingFont(false);
     }
   };
 
@@ -125,6 +169,7 @@ export default function AdminSettingsPage() {
         body: JSON.stringify({
           ...settings,
           theme: selectedTheme,
+          fontStyle: selectedFont,
           adminName: adminName || undefined,
           adminEmail: adminEmail || undefined,
           currentPassword: currentPassword || undefined,
@@ -137,7 +182,7 @@ export default function AdminSettingsPage() {
 
       setFeedback({
         type: "success",
-        text: data.message || "Settings, design theme, and administrator profile saved successfully!",
+        text: data.message || "Settings, design theme, font pairings, and administrator profile saved successfully!",
       });
       if (data.adminEmail) setAdminEmail(data.adminEmail);
       if (data.adminName) setAdminName(data.adminName);
@@ -159,12 +204,13 @@ export default function AdminSettingsPage() {
   });
 
   const activeThemeObj = ACADEMIC_THEMES[selectedTheme] || ACADEMIC_THEMES[DEFAULT_THEME_ID];
+  const activeFontObj = ACADEMIC_FONT_STYLES[selectedFont] || ACADEMIC_FONT_STYLES[DEFAULT_FONT_STYLE_ID];
 
   return (
     <div className="flex-1 flex flex-col min-w-0">
       <AdminHeader
         title="Website Settings & Appearance"
-        subtitle="Manage website visual design theme (18 academic palettes), general site attributes, and administrator security."
+        subtitle="Manage website visual design theme (18 academic palettes), typography font styles (6 curated pairings), and administrator security."
       />
 
       <div className="p-6 sm:p-8 space-y-8 max-w-5xl">
@@ -192,7 +238,7 @@ export default function AdminSettingsPage() {
               <div className="flex items-center gap-2">
                 <Palette className="w-5 h-5 text-emerald-700" />
                 <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">
-                  Website Theme & Appearance (1-Click Instant Change)
+                  Website Theme & Color Palette (1-Click Instant Change)
                 </h2>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
                   18 Handcrafted Designs
@@ -247,11 +293,11 @@ export default function AdminSettingsPage() {
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-bold text-slate-900">
-                    Active: {activeThemeObj.name}
+                    Active Palette: {activeThemeObj.name}
                   </span>
                   {activeThemeObj.isPinned && (
                     <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-200">
-                      📌 Pinned
+                      Pinned
                     </span>
                   )}
                   <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-200 text-slate-700">
@@ -259,7 +305,7 @@ export default function AdminSettingsPage() {
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-500">
-                  {activeThemeObj.description} • Heading Font: {activeThemeObj.fontHeading === "serif" ? "Archival Serif" : "Modern Sans"}
+                  {activeThemeObj.description}
                 </p>
               </div>
             </div>
@@ -275,7 +321,7 @@ export default function AdminSettingsPage() {
               ) : (
                 <Sparkles className="w-3.5 h-3.5" />
               )}
-              <span>Apply Theme Instantly</span>
+              <span>Apply Palette Instantly</span>
             </button>
           </div>
 
@@ -349,9 +395,6 @@ export default function AdminSettingsPage() {
                       <h3 className="font-bold text-sm text-slate-900 leading-tight">
                         {t.name}
                       </h3>
-                      <span className="text-[10px] font-medium text-slate-400">
-                        {t.fontHeading === "serif" ? "Archival Serif Heading" : "Clean Sans Heading"}
-                      </span>
                     </div>
 
                     {/* Color Swatch Preview */}
@@ -409,7 +452,128 @@ export default function AdminSettingsPage() {
           </div>
         </div>
 
-        {/* 2. General Parameters Form */}
+        {/* 2. Typography & Font Style Section */}
+        <div className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-2xs space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Type className="w-5 h-5 text-emerald-700" />
+                <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">
+                  Typography & Academic Font Pairings (6 Curated Styles)
+                </h2>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                  Google Academic Fonts
+                </span>
+              </div>
+              <p className="text-slate-500 text-xs">
+                Pair any color theme with 6 distinguished font styles (Classical Oxford, Bodleian Roman, Modern Literary Journal, MIT Neo-Grotesque, etc.).
+              </p>
+            </div>
+
+            <div className="p-2.5 rounded-lg border border-slate-200 bg-slate-50 flex items-center gap-2 text-xs shrink-0">
+              <span className="text-slate-500 font-medium">Active Typography:</span>
+              <span className="font-bold text-slate-900">
+                {activeFontObj.name}
+              </span>
+            </div>
+          </div>
+
+          {/* Font Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Object.values(ACADEMIC_FONT_STYLES).map((f) => {
+              const isSelected = selectedFont === f.id;
+              return (
+                <div
+                  key={f.id}
+                  onClick={() => applyFontDirectly(f.id)}
+                  className={`p-4 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
+                    isSelected
+                      ? "border-emerald-600 bg-emerald-50/20 shadow-md ring-2 ring-emerald-600/30"
+                      : "border-slate-200 hover:border-slate-300 bg-white hover:shadow-xs"
+                  }`}
+                >
+                  <div className="space-y-3">
+                    {/* Header Tags */}
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                        {f.category}
+                      </span>
+                      {isSelected ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white">
+                          <Check className="w-3 h-3" />
+                          <span>Active Font</span>
+                        </span>
+                      ) : (
+                        <span className="w-4 h-4 rounded-full border border-slate-300" />
+                      )}
+                    </div>
+
+                    {/* Font Name */}
+                    <div>
+                      <h3 className="font-bold text-sm text-slate-900 leading-tight">
+                        {f.name}
+                      </h3>
+                      <span className="text-[10px] font-semibold text-emerald-800">
+                        {f.tag}
+                      </span>
+                    </div>
+
+                    {/* Live Font Sample Showcase */}
+                    <div className="p-3 rounded-lg border border-slate-200/90 bg-slate-50/80 space-y-1">
+                      <div
+                        className="text-base sm:text-lg font-bold text-slate-900 leading-snug"
+                        style={{ fontFamily: f.headingFont }}
+                      >
+                        Dr. Abhishek Rajput
+                      </div>
+                      <div
+                        className="text-xs text-slate-600 italic leading-relaxed"
+                        style={{ fontFamily: f.headingFont }}
+                      >
+                        Structural & Impact Mechanics Lab
+                      </div>
+                      <div
+                        className="text-[11px] text-slate-500 pt-1 border-t border-slate-200/60"
+                        style={{ fontFamily: f.bodyFont }}
+                      >
+                        Sample body text: Ballistic penetration & high-rate material characterization.
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-[11px] text-slate-500 leading-relaxed">
+                      {f.description}
+                    </p>
+                  </div>
+
+                  {/* Action Button */}
+                  <div className="pt-2 border-t border-slate-100">
+                    <button
+                      type="button"
+                      disabled={applyingFont}
+                      className={`w-full py-1.5 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                        isSelected
+                          ? "bg-emerald-600 text-white"
+                          : "bg-slate-100 hover:bg-slate-200 text-slate-800"
+                      }`}
+                    >
+                      {isSelected ? (
+                        <>
+                          <Check className="w-3.5 h-3.5" />
+                          <span>Currently Active</span>
+                        </>
+                      ) : (
+                        <span>Click to Apply (1-Click)</span>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 3. General Parameters Form */}
         <form onSubmit={handleSave} className="space-y-8 text-xs">
           <div className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-2xs space-y-4">
             <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900 border-b border-slate-100 pb-2">
@@ -483,7 +647,7 @@ export default function AdminSettingsPage() {
             </div>
           </div>
 
-          {/* 3. Security & Admin Credentials Change */}
+          {/* 4. Security & Admin Credentials Change */}
           <div className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-2xs space-y-4">
             <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
               <ShieldCheck className="w-5 h-5 text-emerald-700" />
@@ -582,7 +746,7 @@ export default function AdminSettingsPage() {
               className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-lg shadow-sm transition-colors flex items-center gap-2"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              <span>Save All Settings & Profile</span>
+              <span>Save All Settings, Theme & Fonts</span>
             </button>
           </div>
         </form>

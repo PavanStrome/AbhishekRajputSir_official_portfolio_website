@@ -210,6 +210,7 @@ model SiteSettings {
   contactEmail    String   @default("abhishekrajput@iiti.ac.in")
   footerText      String?
   theme           String   @default("cream-terracotta")
+  fontStyle       String   @default("playfair-merriweather")
   enableNews      Boolean  @default(true)
   enableStudents  Boolean  @default(true)
   updatedAt       DateTime @updatedAt

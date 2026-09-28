@@ -3,7 +3,7 @@ import Navbar from "@/components/public/Navbar";
 import Footer from "@/components/public/Footer";
 import NewsTicker from "@/components/public/NewsTicker";
 import { getPublicProfile, getPublicSiteSettings, getPublicNews } from "@/services/academic-service";
-import { getTheme } from "@/lib/themes";
+import { getTheme, getFontStyle } from "@/lib/themes";
 
 export default async function PublicLayout({
   children,
@@ -17,6 +17,7 @@ export default async function PublicLayout({
   ]);
 
   const activeTheme = getTheme(settings?.theme);
+  const activeFont = getFontStyle(settings?.fontStyle);
 
   return (
     <div className="public-theme-root flex flex-col min-h-screen">
@@ -35,15 +36,13 @@ export default async function PublicLayout({
               --accent-subtle: ${activeTheme.cssVars.accentSubtle};
               --badge-bg: ${activeTheme.cssVars.badgeBg};
               --badge-text: ${activeTheme.cssVars.badgeText};
-              --font-heading: ${
-                activeTheme.fontHeading === "serif"
-                  ? 'Georgia, Cambria, "Times New Roman", Times, serif'
-                  : 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-              };
+              --font-heading: ${activeFont.headingFont};
+              --font-body: ${activeFont.bodyFont};
             }
             body {
               background-color: ${activeTheme.cssVars.bgCanvas} !important;
               color: ${activeTheme.cssVars.textMain} !important;
+              font-family: ${activeFont.bodyFont} !important;
             }
           `,
         }}

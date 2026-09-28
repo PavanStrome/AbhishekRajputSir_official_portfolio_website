@@ -425,3 +425,86 @@ export function getTheme(themeId?: string | null): ThemeDefinition {
   }
   return ACADEMIC_THEMES[DEFAULT_THEME_ID];
 }
+
+export interface FontStyleDefinition {
+  id: string;
+  name: string;
+  category: "Classical Serif" | "Contemporary Serif" | "Modern Technical Sans";
+  tag: string;
+  headingFont: string;
+  bodyFont: string;
+  previewSample: string;
+  description: string;
+}
+
+export const ACADEMIC_FONT_STYLES: Record<string, FontStyleDefinition> = {
+  "playfair-merriweather": {
+    id: "playfair-merriweather",
+    name: "Classical Oxford & Ivy League",
+    category: "Classical Serif",
+    tag: "High Authority Serif",
+    headingFont: "'Playfair Display', Georgia, Cambria, 'Times New Roman', serif",
+    bodyFont: "'Merriweather', Georgia, serif",
+    previewSample: "Dr. Abhishek Rajput — Structural Impact Mechanics",
+    description: "Deep, distinguished serifs with dramatic contrast. Resembles Oxford University Press, Cambridge monographs, and Harvard law reviews.",
+  },
+  "eb-garamond": {
+    id: "eb-garamond",
+    name: "Old Style Roman & Bodleian Library",
+    category: "Classical Serif",
+    tag: "Renaissance Scholar",
+    headingFont: "'EB Garamond', Cormorant, Garamond, Georgia, serif",
+    bodyFont: "'EB Garamond', Georgia, serif",
+    previewSample: "Computational Mechanics & Protective Structures",
+    description: "Centuries-old humanist scholarly proportions, calligraphic terminal details, and pure academic warmth.",
+  },
+  "lora-editorial": {
+    id: "lora-editorial",
+    name: "Modern Literary & Scientific Journal",
+    category: "Contemporary Serif",
+    tag: "Editorial Polish",
+    headingFont: "'Lora', Georgia, serif",
+    bodyFont: "system-ui, -apple-system, sans-serif",
+    previewSample: "High-Velocity Impact & Ballistic Perforation",
+    description: "Contemporary brushed serif engineered for readability on digital screens. Preferred by leading scientific journals and academic magazines.",
+  },
+  "plus-jakarta": {
+    id: "plus-jakarta",
+    name: "MIT & Stanford Neo-Grotesque",
+    category: "Modern Technical Sans",
+    tag: "Clean High-Tech",
+    headingFont: "'Plus Jakarta Sans', Inter, system-ui, sans-serif",
+    bodyFont: "'Inter', system-ui, sans-serif",
+    previewSample: "Finite Element & SPH Hydrodynamics Modeling",
+    description: "Ultra-crisp geometric precision, modern clarity, and high data density. Ideal for modern engineering and computational labs.",
+  },
+  "space-grotesk": {
+    id: "space-grotesk",
+    name: "Technical Engineering Mono-Sans",
+    category: "Modern Technical Sans",
+    tag: "Structural & Ballistics",
+    headingFont: "'Space Grotesk', system-ui, sans-serif",
+    bodyFont: "'Inter', system-ui, sans-serif",
+    previewSample: "Dynamic Crushing & Ballistic Penetration Research",
+    description: "Distinct technological character with structural architectural geometry. Captures the physics and engineering essence of crash mechanics.",
+  },
+  "cinzel-academic": {
+    id: "cinzel-academic",
+    name: "Royal Academy & Monumental Lapidary",
+    category: "Classical Serif",
+    tag: "Monumental Dignity",
+    headingFont: "'Cinzel', Georgia, serif",
+    bodyFont: "system-ui, -apple-system, sans-serif",
+    previewSample: "Department of Civil Engineering • IIT Indore",
+    description: "Inspired by classical Roman inscriptions and royal collegiate heraldry, imparting profound professorial dignity and stature.",
+  },
+};
+
+export const DEFAULT_FONT_STYLE_ID = "playfair-merriweather";
+
+export function getFontStyle(styleId?: string | null): FontStyleDefinition {
+  if (styleId && ACADEMIC_FONT_STYLES[styleId]) {
+    return ACADEMIC_FONT_STYLES[styleId];
+  }
+  return ACADEMIC_FONT_STYLES[DEFAULT_FONT_STYLE_ID];
+}

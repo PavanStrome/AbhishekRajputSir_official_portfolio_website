@@ -141,6 +141,7 @@ export const siteSettingsSchema = z.object({
   contactEmail: z.string().email("Invalid contact email"),
   footerText: z.string().nullable().optional(),
   theme: z.string().optional().default("cream-terracotta"),
+  fontStyle: z.string().optional().default("playfair-merriweather"),
   enableNews: z.boolean().default(true),
   enableStudents: z.boolean().default(true),
 });
