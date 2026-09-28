@@ -340,14 +340,14 @@ export default function AdminSettingsPage() {
               <div className="flex items-center gap-2">
                 <Palette className="w-5 h-5 text-emerald-700" />
                 <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">
-                  Section 1: Website Theme & Color Palette (18 Academic Designs)
+                  Section 1: Website Theme & Color Palette (30 Curated Designs)
                 </h2>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                  18 Palettes
+                  30 Palettes (18 Light + 12 Dark)
                 </span>
               </div>
               <p className="text-slate-500 text-xs">
-                Select from 18 academic color themes (Warm Archival papers, Prestigious Universities, Modern Minimalist, Nature, and Dark Modes).
+                Select from 30 academic color themes (Warm Archival papers, Prestigious Universities, Modern Minimalist, Nature, and Scholarly Dark Modes).
               </p>
             </div>
 
@@ -362,11 +362,11 @@ export default function AdminSettingsPage() {
             {[
               { id: "all", label: `All Palettes (${themeList.length})` },
               { id: "pinned", label: "📌 Pinned Favorites (2)" },
-              { id: "Archival & Editorial", label: "Archival & Editorial (4)" },
-              { id: "Prestigious Universities", label: "Prestigious Universities (4)" },
-              { id: "Modern Minimalist", label: "Modern Minimalist (4)" },
-              { id: "Earth & Nature", label: "Earth & Nature (4)" },
-              { id: "Scholarly Night", label: "Scholarly Night (2)" },
+              { id: "Archival & Editorial", label: "Archival & Editorial (5)" },
+              { id: "Prestigious Universities", label: "Prestigious Universities (6)" },
+              { id: "Modern Minimalist", label: "Modern Minimalist (5)" },
+              { id: "Earth & Nature", label: "Earth & Nature (6)" },
+              { id: "Scholarly Night", label: "🌙 Scholarly Night / Dark (8)" },
             ].map((f) => (
               <button
                 key={f.id}
@@ -491,10 +491,10 @@ export default function AdminSettingsPage() {
               <div className="flex items-center gap-2">
                 <Type className="w-5 h-5 text-emerald-700" />
                 <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">
-                  Section 2: Typography & Font Style (6 Curated Academic Pairings)
+                  Section 2: Typography & Font Style (30 Curated Academic Pairings)
                 </h2>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                  Google Academic Fonts
+                  30 Google Academic Fonts
                 </span>
               </div>
               <p className="text-slate-500 text-xs">
@@ -514,9 +514,10 @@ export default function AdminSettingsPage() {
           <div className="flex flex-wrap gap-1.5 pt-1">
             {[
               { id: "all", label: `All Fonts (${fontList.length})` },
-              { id: "Classical Serif", label: "🏛️ Classical Serif (3)" },
-              { id: "Contemporary Serif", label: "📰 Contemporary Serif (1)" },
-              { id: "Modern Technical Sans", label: "⚡ Modern Technical Sans (2)" },
+              { id: "Classical Serif", label: "🏛️ Classical & Heritage (8)" },
+              { id: "Contemporary Serif", label: "📰 Contemporary & Scientific (8)" },
+              { id: "Modern Technical Sans", label: "⚡ Modern Technical & STEM (8)" },
+              { id: "Monospace & Architectural", label: "🔬 Monospace & Hybrids (6)" },
             ].map((f) => (
               <button
                 key={f.id}

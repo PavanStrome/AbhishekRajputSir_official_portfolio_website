@@ -22,6 +22,7 @@ import {
   AlertCircle,
   Loader2,
   Type,
+  Palette,
 } from "lucide-react";
 import {
   ACADEMIC_THEMES,
@@ -34,7 +35,8 @@ import {
 export default function DesignPreviewPage() {
   const [selectedThemeId, setSelectedThemeId] = useState<string>(DEFAULT_THEME_ID);
   const [selectedFontId, setSelectedFontId] = useState<string>(DEFAULT_FONT_STYLE_ID);
-  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [themeCategoryFilter, setThemeCategoryFilter] = useState<string>("all");
+  const [fontCategoryFilter, setFontCategoryFilter] = useState<string>("all");
   const [applying, setApplying] = useState(false);
   const [saveStatus, setSaveStatus] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
@@ -42,9 +44,14 @@ export default function DesignPreviewPage() {
   const fontList = Object.values(ACADEMIC_FONT_STYLES);
 
   const filteredThemes = themeList.filter((t) => {
-    if (categoryFilter === "all") return true;
-    if (categoryFilter === "pinned") return t.isPinned;
-    return t.category === categoryFilter;
+    if (themeCategoryFilter === "all") return true;
+    if (themeCategoryFilter === "pinned") return t.isPinned;
+    return t.category === themeCategoryFilter;
+  });
+
+  const filteredFonts = fontList.filter((f) => {
+    if (fontCategoryFilter === "all") return true;
+    return f.category === fontCategoryFilter;
   });
 
   const activeTheme = ACADEMIC_THEMES[selectedThemeId] || ACADEMIC_THEMES[DEFAULT_THEME_ID];
@@ -79,7 +86,7 @@ export default function DesignPreviewPage() {
 
       setSaveStatus({
         type: "success",
-        text: `Design "${activeTheme.name}" + Typography "${activeFont.name}" are now LIVE on the public website!`,
+        text: `✨ Combination [${activeTheme.name}] + [${activeFont.name}] is now LIVE on the public website!`,
       });
     } catch (err: any) {
       setSaveStatus({
@@ -103,14 +110,14 @@ export default function DesignPreviewPage() {
                   <Sliders className="w-4 h-4" />
                 </span>
                 <h1 className="text-sm sm:text-base font-bold text-white tracking-tight">
-                  Academic Design Explorer (18 Themes × 6 Font Pairings)
+                  Academic Design Explorer (30 Themes × 30 Font Pairings)
                 </h1>
                 <span className="hidden sm:inline px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">
-                  108 Live Combinations
+                  900 Live Combinations
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
-                Toggle through 18 color palettes and 6 prestigious typography styles in real time below.
+                Test any of the 30 color palettes with any of the 30 typography font styles in real time below.
               </p>
             </div>
 
@@ -157,88 +164,134 @@ export default function DesignPreviewPage() {
             </div>
           )}
 
-          {/* Typography Selector Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pt-1 pb-1 no-scrollbar text-xs">
-            <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1 shrink-0 uppercase tracking-wider">
-              <Type className="w-3 h-3 text-emerald-400" />
-              <span>Fonts:</span>
+          {/* Active Combination Quick Strip */}
+          <div className="flex items-center gap-2 text-xs bg-slate-900/90 p-2 rounded-lg border border-slate-800 flex-wrap">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              Selected Pairing:
             </span>
-            {fontList.map((f) => {
-              const isSelected = selectedFontId === f.id;
-              return (
-                <button
-                  key={f.id}
-                  onClick={() => setSelectedFontId(f.id)}
-                  className={`px-2.5 py-1 rounded-md text-xs font-semibold shrink-0 transition-all border ${
-                    isSelected
-                      ? "bg-emerald-600 text-white border-emerald-500 shadow-xs"
-                      : "bg-slate-900 border-slate-800 hover:border-slate-700 text-slate-300"
-                  }`}
-                >
-                  <span style={{ fontFamily: f.headingFont }}>{f.name}</span>
-                </button>
-              );
-            })}
+            <span className="px-2 py-0.5 rounded bg-slate-800 text-white font-bold border border-slate-700 flex items-center gap-1">
+              <Palette className="w-3 h-3 text-emerald-400" />
+              <span>{activeTheme.name}</span>
+            </span>
+            <span className="text-slate-500 font-bold">+</span>
+            <span
+              className="px-2 py-0.5 rounded bg-slate-800 text-white font-bold border border-slate-700 flex items-center gap-1"
+              style={{ fontFamily: activeFont.headingFont }}
+            >
+              <Type className="w-3 h-3 text-emerald-400" />
+              <span>{activeFont.name}</span>
+            </span>
           </div>
 
-          {/* Category Tabs */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pt-1 pb-1 no-scrollbar text-xs border-t border-slate-800/80">
-            {[
-              { id: "all", label: `All Palettes (18)` },
-              { id: "pinned", label: "📌 Pinned (2)" },
-              { id: "Archival & Editorial", label: "Archival (4)" },
-              { id: "Prestigious Universities", label: "Universities (4)" },
-              { id: "Modern Minimalist", label: "Minimalist (4)" },
-              { id: "Earth & Nature", label: "Nature (4)" },
-              { id: "Scholarly Night", label: "Dark (2)" },
-            ].map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setCategoryFilter(cat.id)}
-                className={`px-2.5 py-0.5 rounded-md font-semibold text-[11px] transition-colors shrink-0 ${
-                  categoryFilter === cat.id
-                    ? "bg-slate-200 text-slate-900"
-                    : "bg-slate-800/80 hover:bg-slate-800 text-slate-400"
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Theme Horizontal Selector */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-            {filteredThemes.map((t) => {
-              const isSelected = selectedThemeId === t.id;
-              return (
+          {/* Typography Filter & Selector */}
+          <div className="space-y-1.5 pt-1">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar text-xs">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0">
+                🔤 Font Category:
+              </span>
+              {[
+                { id: "all", label: `All Fonts (30)` },
+                { id: "Classical Serif", label: "🏛️ Classical & Heritage (8)" },
+                { id: "Contemporary Serif", label: "📰 Contemporary & Scientific (8)" },
+                { id: "Modern Technical Sans", label: "⚡ Modern STEM (8)" },
+                { id: "Monospace & Architectural", label: "🔬 Monospace & Hybrid (6)" },
+              ].map((c) => (
                 <button
-                  key={t.id}
-                  onClick={() => setSelectedThemeId(t.id)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 shrink-0 transition-all border ${
-                    isSelected
-                      ? "bg-slate-800 border-emerald-400 text-white shadow-sm ring-1 ring-emerald-400"
-                      : "bg-slate-900/90 border-slate-800 hover:border-slate-700 text-slate-400 hover:text-slate-200"
+                  key={c.id}
+                  onClick={() => setFontCategoryFilter(c.id)}
+                  className={`px-2 py-0.5 rounded font-semibold text-[11px] transition-colors shrink-0 ${
+                    fontCategoryFilter === c.id
+                      ? "bg-slate-200 text-slate-900"
+                      : "bg-slate-800/80 hover:bg-slate-800 text-slate-400"
                   }`}
                 >
-                  <div className="flex items-center -space-x-1 shrink-0">
-                    <div
-                      className="w-3.5 h-3.5 rounded-full border border-slate-700"
-                      style={{ backgroundColor: t.swatch.canvas }}
-                    />
-                    <div
-                      className="w-3.5 h-3.5 rounded-full border border-slate-700"
-                      style={{ backgroundColor: t.swatch.card }}
-                    />
-                    <div
-                      className="w-3.5 h-3.5 rounded-full border border-slate-700"
-                      style={{ backgroundColor: t.swatch.accent }}
-                    />
-                  </div>
-                  <span>{t.name}</span>
-                  {t.isPinned && <Pin className="w-2.5 h-2.5 text-amber-400" />}
+                  {c.label}
                 </button>
-              );
-            })}
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+              {filteredFonts.map((f) => {
+                const isSelected = selectedFontId === f.id;
+                return (
+                  <button
+                    key={f.id}
+                    onClick={() => setSelectedFontId(f.id)}
+                    className={`px-2.5 py-1 rounded-md text-xs font-semibold shrink-0 transition-all border ${
+                      isSelected
+                        ? "bg-emerald-600 text-white border-emerald-500 shadow-xs ring-1 ring-emerald-400"
+                        : "bg-slate-900 border-slate-800 hover:border-slate-700 text-slate-300"
+                    }`}
+                  >
+                    <span style={{ fontFamily: f.headingFont }}>{f.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Theme Palette Filter & Selector */}
+          <div className="space-y-1.5 pt-1 border-t border-slate-800/80">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar text-xs">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0">
+                🎨 Palette Category:
+              </span>
+              {[
+                { id: "all", label: `All Palettes (30)` },
+                { id: "pinned", label: "📌 Pinned (2)" },
+                { id: "Archival & Editorial", label: "Archival (5)" },
+                { id: "Prestigious Universities", label: "Universities (6)" },
+                { id: "Modern Minimalist", label: "Minimalist (5)" },
+                { id: "Earth & Nature", label: "Nature (6)" },
+                { id: "Scholarly Night", label: "🌙 Dark Modes (8)" },
+              ].map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setThemeCategoryFilter(cat.id)}
+                  className={`px-2 py-0.5 rounded font-semibold text-[11px] transition-colors shrink-0 ${
+                    themeCategoryFilter === cat.id
+                      ? "bg-slate-200 text-slate-900"
+                      : "bg-slate-800/80 hover:bg-slate-800 text-slate-400"
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+              {filteredThemes.map((t) => {
+                const isSelected = selectedThemeId === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => setSelectedThemeId(t.id)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 shrink-0 transition-all border ${
+                      isSelected
+                        ? "bg-slate-800 border-emerald-400 text-white shadow-sm ring-1 ring-emerald-400"
+                        : "bg-slate-900/90 border-slate-800 hover:border-slate-700 text-slate-400 hover:text-slate-200"
+                    }`}
+                  >
+                    <div className="flex items-center -space-x-1 shrink-0">
+                      <div
+                        className="w-3.5 h-3.5 rounded-full border border-slate-700"
+                        style={{ backgroundColor: t.swatch.canvas }}
+                      />
+                      <div
+                        className="w-3.5 h-3.5 rounded-full border border-slate-700"
+                        style={{ backgroundColor: t.swatch.card }}
+                      />
+                      <div
+                        className="w-3.5 h-3.5 rounded-full border border-slate-700"
+                        style={{ backgroundColor: t.swatch.accent }}
+                      />
+                    </div>
+                    <span>{t.name}</span>
+                    {t.isPinned && <Pin className="w-2.5 h-2.5 text-amber-400" />}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
