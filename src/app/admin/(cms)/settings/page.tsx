@@ -27,7 +27,6 @@ import {
   ToggleLeft,
   ToggleRight,
   Layers,
-  Sliders,
   Settings,
   Compass,
 } from "lucide-react";
@@ -46,7 +45,7 @@ function AdminSettingsContent() {
   const router = useRouter();
   const tabParam = searchParams.get("tab");
 
-  // Determine active tab: "themes" | "typography" | "general" | "all"
+  // Active tab: "themes" | "typography" | "general" | "all"
   const [activeTab, setActiveTab] = useState<"themes" | "typography" | "general" | "all">(
     tabParam === "typography" ? "typography" : tabParam === "general" ? "general" : tabParam === "all" ? "all" : "themes"
   );
@@ -77,7 +76,7 @@ function AdminSettingsContent() {
   const [selectedTheme, setSelectedTheme] = useState<string>(DEFAULT_THEME_ID);
   const [selectedFont, setSelectedFont] = useState<string>(DEFAULT_FONT_STYLE_ID);
 
-  // Interactive Live Preview tester selections (allows real-time testing of any combination)
+  // Interactive Live Preview tester selections
   const [previewThemeId, setPreviewThemeId] = useState<string>(DEFAULT_THEME_ID);
   const [previewFontId, setPreviewFontId] = useState<string>(DEFAULT_FONT_STYLE_ID);
   const [isModalPreviewOpen, setIsModalPreviewOpen] = useState(false);
@@ -120,7 +119,7 @@ function AdminSettingsContent() {
       .finally(() => setLoading(false));
   }, []);
 
-  // 1-Click Apply for Color Theme (preserves current font style)
+  // 1-Click Apply for Color Theme
   const applyThemeDirectly = async (themeId: string) => {
     setSelectedTheme(themeId);
     setPreviewThemeId(themeId);
@@ -145,7 +144,7 @@ function AdminSettingsContent() {
       const fontObj = getFontStyle(selectedFont);
       setFeedback({
         type: "success",
-        text: `🎨 Color palette "${themeObj.name}" applied live! Paired with font "${fontObj.name}". The public portal has been instantly updated.`,
+        text: `🎨 Color palette "${themeObj.name}" applied live! Paired with font "${fontObj.name}". Public portal updated.`,
       });
     } catch (err: any) {
       setFeedback({ type: "error", text: err.message || "Failed to apply theme" });
@@ -154,7 +153,7 @@ function AdminSettingsContent() {
     }
   };
 
-  // 1-Click Apply for Font Style (preserves current color theme)
+  // 1-Click Apply for Font Style
   const applyFontDirectly = async (fontId: string) => {
     setSelectedFont(fontId);
     setPreviewFontId(fontId);
@@ -179,7 +178,7 @@ function AdminSettingsContent() {
       const themeObj = getTheme(selectedTheme);
       setFeedback({
         type: "success",
-        text: `🔤 Typography style "${fontObj.name}" applied live! Paired with palette "${themeObj.name}". The public portal has been instantly updated.`,
+        text: `🔤 Typography "${fontObj.name}" applied live! Paired with palette "${themeObj.name}". Public portal updated.`,
       });
     } catch (err: any) {
       setFeedback({ type: "error", text: err.message || "Failed to apply font style" });
@@ -213,7 +212,7 @@ function AdminSettingsContent() {
       const fontObj = getFontStyle(fontId);
       setFeedback({
         type: "success",
-        text: `✨ Active Combination Updated Live: [${themeObj.name}] + [${fontObj.name}]! The entire public portal has been instantly refreshed.`,
+        text: `✨ Active Combination Updated Live: [${themeObj.name}] + [${fontObj.name}]!`,
       });
     } catch (err: any) {
       setFeedback({ type: "error", text: err.message || "Failed to apply combination" });
@@ -227,7 +226,6 @@ function AdminSettingsContent() {
     setSaving(true);
     setFeedback(null);
 
-    // If attempting to change password or admin credentials
     if (newPassword) {
       if (newPassword.length < 8) {
         setFeedback({ type: "error", text: "New password must be at least 8 characters long." });
@@ -308,14 +306,14 @@ function AdminSettingsContent() {
   return (
     <div className="flex-1 flex flex-col min-w-0">
       <AdminHeader
-        title="Website Preferences & Architecture"
-        subtitle="Manage 30 academic color themes, 30 typography font pairings, and website configuration across 3 dedicated sections."
+        title="Website Settings & Appearance"
+        subtitle="Configure your live academic theme, typography styles, and website content."
       />
 
       <div className="p-6 sm:p-8 space-y-6 max-w-5xl">
         {feedback && (
           <div
-            className={`p-4 rounded-xl text-xs font-semibold flex items-center gap-2 ${
+            className={`p-3.5 rounded-xl text-xs font-semibold flex items-center gap-2 ${
               feedback.type === "success"
                 ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
                 : "bg-rose-50 text-rose-800 border border-rose-200"
@@ -330,44 +328,44 @@ function AdminSettingsContent() {
           </div>
         )}
 
-        {/* Master Combination Status Banner */}
-        <div className="p-5 rounded-2xl border-2 border-emerald-600/70 bg-emerald-50/50 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-start sm:items-center gap-3">
-            <span className="p-2.5 rounded-xl bg-emerald-700 text-white shadow-xs shrink-0">
-              <Sparkles className="w-5 h-5" />
+        {/* ============================================================== */}
+        {/* CLEAN UNIFIED TOP STATUS BAR (No bulky boxes, single clean row) */}
+        {/* ============================================================== */}
+        <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="p-2 rounded-xl bg-emerald-700 text-white shadow-xs shrink-0">
+              <Sparkles className="w-4 h-4" />
             </span>
-            <div>
-              <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-900">
-                Active Website Combination (Live for Viewers)
+            <div className="space-y-0.5">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                Live Public Website Combination
               </div>
-              <div className="flex items-center gap-2 flex-wrap mt-0.5">
-                <span className="font-extrabold text-sm text-slate-900 flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-lg border border-emerald-200 shadow-2xs">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-800 border border-slate-200">
                   <Palette className="w-3.5 h-3.5 text-emerald-700" />
                   <span>{activeThemeObj.name}</span>
                 </span>
-                <span className="text-slate-400 font-bold text-sm">+</span>
+                <span className="text-slate-400 text-xs font-bold">+</span>
                 <span
-                  className="font-extrabold text-sm text-slate-900 flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-lg border border-emerald-200 shadow-2xs"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-800 border border-slate-200"
                   style={{ fontFamily: activeFontObj.headingFont }}
                 >
                   <Type className="w-3.5 h-3.5 text-emerald-700" />
                   <span>{activeFontObj.name}</span>
                 </span>
               </div>
-              <p className="text-[11px] text-slate-600 mt-1">
-                Any color palette can be mixed and matched with any font style. Select a section tab below to jump straight to editing!
-              </p>
             </div>
           </div>
 
+          {/* Quick Global Launchers (Design Explorer & Fullscreen Preview) */}
           <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={() => setIsModalPreviewOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-emerald-300 bg-white hover:bg-emerald-50 text-emerald-800 text-xs font-semibold transition-colors shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors shadow-2xs"
             >
-              <Maximize2 className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Fullscreen Live Preview</span>
+              <Maximize2 className="w-3.5 h-3.5 text-slate-500" />
+              <span>Fullscreen Preview</span>
             </button>
 
             <Link
@@ -383,13 +381,13 @@ function AdminSettingsContent() {
         </div>
 
         {/* ============================================================== */}
-        {/* FAST ACCESS TABS (Instantly Switch Between the 3 Sub-sections) */}
+        {/* CLEAN SEGMENTED TABS (Instant Switch Without Redundancy)       */}
         {/* ============================================================== */}
-        <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-3">
+        <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-2">
           <button
             type="button"
             onClick={() => handleTabChange("themes")}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
               activeTab === "themes"
                 ? "bg-emerald-700 text-white shadow-xs"
                 : "bg-slate-100 hover:bg-slate-200 text-slate-700"
@@ -402,7 +400,7 @@ function AdminSettingsContent() {
           <button
             type="button"
             onClick={() => handleTabChange("typography")}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
               activeTab === "typography"
                 ? "bg-emerald-700 text-white shadow-xs"
                 : "bg-slate-100 hover:bg-slate-200 text-slate-700"
@@ -415,20 +413,20 @@ function AdminSettingsContent() {
           <button
             type="button"
             onClick={() => handleTabChange("general")}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
               activeTab === "general"
                 ? "bg-emerald-700 text-white shadow-xs"
                 : "bg-slate-100 hover:bg-slate-200 text-slate-700"
             }`}
           >
             <Settings className="w-3.5 h-3.5" />
-            <span>3. Website Info &amp; Text Settings</span>
+            <span>3. Website Info &amp; Text</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleTabChange("all")}
-            className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
               activeTab === "all"
                 ? "bg-slate-900 text-white shadow-xs"
                 : "bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200"
@@ -441,57 +439,66 @@ function AdminSettingsContent() {
 
         {/* ============================================================== */}
         {/* SECTION 1: WEBSITE THEME & COLOR PALETTE (30 CURATED DESIGNS)  */}
+        {/* Clean, un-cluttered layout without duplicate buttons/badges    */}
         {/* ============================================================== */}
         {(activeTab === "themes" || activeTab === "all") && (
-          <div className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-2xs space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-              <div className="space-y-1">
+          <div className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-2xs space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+              <div>
                 <div className="flex items-center gap-2">
-                  <Palette className="w-5 h-5 text-emerald-700" />
-                  <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">
-                    Section 1: Website Theme &amp; Color Palette (30 Curated Designs)
+                  <Palette className="w-4 h-4 text-emerald-700" />
+                  <h2 className="text-sm font-bold text-slate-900">
+                    Section 1: Academic Color Themes
                   </h2>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                    30 Palettes (18 Light + 12 Dark)
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                    30 Palettes
                   </span>
                 </div>
-                <p className="text-slate-500 text-xs">
-                  Select from 30 academic color themes. Click &ldquo;Live Preview&rdquo; on any palette to test it instantly in the interactive preview sandbox below.
+                <p className="text-slate-500 text-xs mt-0.5">
+                  Click &ldquo;Live Preview&rdquo; on any palette to test it below, or &ldquo;Apply (1-Click)&rdquo; to publish.
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
-                <Link
-                  href="/design-preview"
-                  target="_blank"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors"
-                >
-                  <Compass className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Design Explorer</span>
-                  <ExternalLink className="w-3 h-3 text-slate-400" />
-                </Link>
-
-                <div className="p-2 rounded-lg border border-slate-200 bg-slate-50 flex items-center gap-2 text-xs">
-                  <span className="text-slate-500 font-medium">Currently Live:</span>
-                  <span className="font-bold text-slate-900">{activeThemeObj.name}</span>
-                </div>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {[
+                  { id: "all", label: "All (30)" },
+                  { id: "pinned", label: "📌 Pinned (2)" },
+                  { id: "Archival & Editorial", label: "Archival (5)" },
+                  { id: "Prestigious Universities", label: "Universities (6)" },
+                  { id: "Modern Minimalist", label: "Minimalist (5)" },
+                  { id: "Earth & Nature", label: "Nature (6)" },
+                  { id: "Scholarly Night", label: "🌙 Dark (8)" },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => setThemeFilter(f.id)}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all ${
+                      themeFilter === f.id
+                        ? "bg-slate-900 text-white shadow-2xs"
+                        : "bg-slate-100 hover:bg-slate-200 text-slate-700"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Interactive Live Preview Box for Section 1 */}
-            <div className="rounded-xl border border-slate-300/80 bg-slate-50/60 p-4 sm:p-5 space-y-4 shadow-2xs">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-3">
+            {/* Streamlined Live Preview Sandbox for Section 1 */}
+            <div className="rounded-xl border border-slate-200/90 bg-slate-50/70 p-4 space-y-3 shadow-2xs">
+              <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <Eye className="w-4 h-4 text-emerald-700" />
-                  <span className="text-xs font-bold text-slate-800 uppercase tracking-wide">
-                    Live Preview Sandbox for Section 1
+                  <span className="text-xs font-bold text-slate-800">
+                    Interactive Live Preview:
                   </span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 font-medium">
-                    Testing: {previewThemeObj.name}
+                  <span className="text-xs font-extrabold text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-200 shadow-2xs">
+                    {previewThemeObj.name}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div>
                   {isPreviewDifferentFromActive ? (
                     <button
                       type="button"
@@ -504,48 +511,28 @@ function AdminSettingsContent() {
                       ) : (
                         <Sparkles className="w-3 h-3" />
                       )}
-                      <span>Apply This Tested Theme Live</span>
+                      <span>Apply This Palette Live</span>
                     </button>
                   ) : (
                     <span className="text-[11px] font-semibold text-emerald-700 flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
                       <Check className="w-3 h-3" />
-                      <span>This palette is currently live on your site</span>
+                      <span>Currently Live on Website</span>
                     </span>
                   )}
-
-                  <Link
-                    href="/design-preview"
-                    target="_blank"
-                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1"
-                  >
-                    <Compass className="w-3 h-3 text-slate-500" />
-                    <span>Design Explorer</span>
-                    <ExternalLink className="w-3 h-3 text-slate-400" />
-                  </Link>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsModalPreviewOpen(true)}
-                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1"
-                  >
-                    <Maximize2 className="w-3 h-3 text-slate-500" />
-                    <span>Expand</span>
-                  </button>
                 </div>
               </div>
 
-              {/* Simulated Live Portal Component rendered with previewTheme colors & previewFont typography */}
+              {/* Simulated Live Portal Component */}
               <div
-                className="rounded-xl p-5 border transition-all duration-300 shadow-sm space-y-4"
+                className="rounded-xl p-4 sm:p-5 border transition-all duration-200 shadow-2xs space-y-3"
                 style={{
                   backgroundColor: previewThemeObj.cssVars.bgCanvas,
                   borderColor: previewThemeObj.cssVars.borderColor,
                   color: previewThemeObj.cssVars.textMain,
                 }}
               >
-                {/* Header preview row */}
-                <div className="flex items-center justify-between pb-3 border-b" style={{ borderColor: previewThemeObj.cssVars.borderColor }}>
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between pb-2.5 border-b" style={{ borderColor: previewThemeObj.cssVars.borderColor }}>
+                  <div className="flex items-center gap-2.5">
                     <div
                       className="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs text-white"
                       style={{ backgroundColor: previewThemeObj.cssVars.accentPrimary }}
@@ -562,28 +549,19 @@ function AdminSettingsContent() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                      style={{
-                        backgroundColor: previewThemeObj.cssVars.badgeBg,
-                        color: previewThemeObj.cssVars.badgeText,
-                      }}
-                    >
-                      {previewThemeObj.category}
-                    </span>
-                    <span
-                      className="text-[10px] font-bold px-2 py-0.5 rounded-md text-white"
-                      style={{ backgroundColor: previewThemeObj.cssVars.accentPrimary }}
-                    >
-                      Accent Button
-                    </span>
-                  </div>
+                  <span
+                    className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                    style={{
+                      backgroundColor: previewThemeObj.cssVars.badgeBg,
+                      color: previewThemeObj.cssVars.badgeText,
+                    }}
+                  >
+                    {previewThemeObj.category}
+                  </span>
                 </div>
 
-                {/* Sample Card within the canvas */}
                 <div
-                  className="p-4 rounded-lg border transition-all"
+                  className="p-3.5 rounded-lg border transition-all"
                   style={{
                     backgroundColor: previewThemeObj.cssVars.bgCard,
                     borderColor: previewThemeObj.cssVars.borderColor,
@@ -591,21 +569,21 @@ function AdminSettingsContent() {
                 >
                   <div className="flex items-center justify-between gap-2 mb-1">
                     <span
-                      className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded"
+                      className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
                       style={{
                         backgroundColor: previewThemeObj.cssVars.accentSubtle,
                         color: previewThemeObj.cssVars.accentPrimary,
                       }}
                     >
-                      Featured Publication (Sample)
+                      Sample Publication
                     </span>
                     <span className="text-[10px]" style={{ color: previewThemeObj.cssVars.textMuted }}>
-                      Int. J. Impact Engineering (2024)
+                      Int. J. Impact Eng. (2024)
                     </span>
                   </div>
 
                   <h4
-                    className="font-bold text-sm sm:text-base leading-snug mt-1"
+                    className="font-bold text-sm leading-snug mt-1"
                     style={{
                       fontFamily: previewFontObj.headingFont,
                       color: previewThemeObj.cssVars.textMain,
@@ -615,7 +593,7 @@ function AdminSettingsContent() {
                   </h4>
 
                   <p
-                    className="text-xs mt-1.5 leading-relaxed"
+                    className="text-xs mt-1 leading-relaxed"
                     style={{
                       fontFamily: previewFontObj.bodyFont,
                       color: previewThemeObj.cssVars.textMuted,
@@ -623,47 +601,12 @@ function AdminSettingsContent() {
                   >
                     Investigating high-velocity impact dynamics using explicit non-linear finite element formulations and Kolsky bar high-strain-rate experiments.
                   </p>
-
-                  <div className="flex items-center gap-3 mt-3 pt-2 border-t" style={{ borderColor: previewThemeObj.cssVars.borderColor }}>
-                    <span className="text-[10px] font-semibold" style={{ color: previewThemeObj.cssVars.accentPrimary }}>
-                      DOI: 10.1016/j.ijimpeng.2024.104982
-                    </span>
-                    <span className="text-[10px]" style={{ color: previewThemeObj.cssVars.textMuted }}>
-                      • Citations: 420+
-                    </span>
-                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Theme Category Filter Pills */}
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {[
-                { id: "all", label: `All Palettes (${themeList.length})` },
-                { id: "pinned", label: "📌 Pinned Favorites (2)" },
-                { id: "Archival & Editorial", label: "Archival & Editorial (5)" },
-                { id: "Prestigious Universities", label: "Prestigious Universities (6)" },
-                { id: "Modern Minimalist", label: "Modern Minimalist (5)" },
-                { id: "Earth & Nature", label: "Earth & Nature (6)" },
-                { id: "Scholarly Night", label: "🌙 Scholarly Night / Dark (8)" },
-              ].map((f) => (
-                <button
-                  key={f.id}
-                  type="button"
-                  onClick={() => setThemeFilter(f.id)}
-                  className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
-                    themeFilter === f.id
-                      ? "bg-slate-900 text-white shadow-xs"
-                      : "bg-slate-100 hover:bg-slate-200 text-slate-700"
-                  }`}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
-
             {/* Theme Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-1">
               {filteredThemes.map((t) => {
                 const isLive = selectedTheme === t.id;
                 const isPreviewing = previewThemeId === t.id;
@@ -672,83 +615,74 @@ function AdminSettingsContent() {
                   <div
                     key={t.id}
                     onClick={() => setPreviewThemeId(t.id)}
-                    className={`relative p-4 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
+                    className={`relative p-3.5 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between space-y-2.5 ${
                       isLive
-                        ? "border-emerald-600 bg-emerald-50/20 shadow-md ring-2 ring-emerald-600/30"
+                        ? "border-emerald-600 bg-emerald-50/20 shadow-xs ring-2 ring-emerald-600/30"
                         : isPreviewing
-                        ? "border-blue-500 bg-blue-50/20 shadow-sm ring-2 ring-blue-400/20"
-                        : "border-slate-200 hover:border-slate-300 bg-white hover:shadow-xs"
+                        ? "border-blue-500 bg-blue-50/20 shadow-2xs ring-2 ring-blue-400/20"
+                        : "border-slate-200 hover:border-slate-300 bg-white"
                     }`}
                   >
                     <div className="space-y-2">
-                      {/* Header Tags */}
                       <div className="flex items-center justify-between gap-1">
-                        <div className="flex items-center gap-1.5 flex-wrap">
+                        <div className="flex items-center gap-1.5">
                           {t.isPinned && (
-                            <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
                               <Pin className="w-2.5 h-2.5" />
                               <span>Pinned</span>
                             </span>
                           )}
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600">
                             {t.category.split(" ")[0]}
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-1">
-                          {isPreviewing && !isLive && (
-                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 border border-blue-200">
-                              <Eye className="w-2.5 h-2.5" />
-                              <span>Previewing</span>
-                            </span>
-                          )}
-                          {isLive ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white">
-                              <Check className="w-3 h-3" />
-                              <span>Live</span>
-                            </span>
-                          ) : (
-                            <span className="w-4 h-4 rounded-full border border-slate-300" />
-                          )}
-                        </div>
+                        {isLive ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white">
+                            <Check className="w-3 h-3" />
+                            <span>Live</span>
+                          </span>
+                        ) : isPreviewing ? (
+                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700">
+                            <Eye className="w-2.5 h-2.5" />
+                            <span>Testing</span>
+                          </span>
+                        ) : (
+                          <span className="w-3.5 h-3.5 rounded-full border border-slate-300" />
+                        )}
                       </div>
 
-                      {/* Theme Name */}
-                      <div>
-                        <h3 className="font-bold text-sm text-slate-900 leading-tight">
-                          {t.name}
-                        </h3>
-                      </div>
+                      <h3 className="font-bold text-xs text-slate-900 leading-tight">
+                        {t.name}
+                      </h3>
 
-                      {/* Color Swatch Preview */}
-                      <div className="p-2.5 rounded-lg border border-slate-200/80 bg-slate-50 flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
+                      {/* Swatch */}
+                      <div className="p-2 rounded-lg border border-slate-200/80 bg-slate-50 flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5">
                           <div
-                            className="w-5 h-5 rounded-md border border-slate-300/80 shadow-2xs"
+                            className="w-4 h-4 rounded border border-slate-300/80 shadow-2xs"
                             style={{ backgroundColor: t.swatch.canvas }}
                             title={`Canvas: ${t.swatch.canvas}`}
                           />
                           <div
-                            className="w-5 h-5 rounded-md border border-slate-300/80 shadow-2xs"
+                            className="w-4 h-4 rounded border border-slate-300/80 shadow-2xs"
                             style={{ backgroundColor: t.swatch.card }}
                             title={`Card: ${t.swatch.card}`}
                           />
                         </div>
                         <div
-                          className="px-2.5 py-1 rounded text-[10px] font-bold text-white shadow-2xs"
+                          className="px-2 py-0.5 rounded text-[9px] font-bold text-white shadow-2xs"
                           style={{ backgroundColor: t.swatch.accent }}
                         >
                           Accent
                         </div>
                       </div>
 
-                      {/* Description */}
-                      <p className="text-[11px] text-slate-500 leading-relaxed line-clamp-2">
+                      <p className="text-[10px] text-slate-500 leading-relaxed line-clamp-2">
                         {t.description}
                       </p>
                     </div>
 
-                    {/* Action Buttons: Preview & 1-Click Apply */}
                     <div className="pt-2 border-t border-slate-100 flex items-center gap-2">
                       <button
                         type="button"
@@ -759,7 +693,7 @@ function AdminSettingsContent() {
                         className="flex-1 py-1.5 px-2 rounded-lg text-[11px] font-bold border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 transition-colors flex items-center justify-center gap-1"
                       >
                         <Eye className="w-3 h-3 text-slate-500" />
-                        <span>Live Preview</span>
+                        <span>Preview</span>
                       </button>
 
                       <button
@@ -781,7 +715,7 @@ function AdminSettingsContent() {
                             <span>Active</span>
                           </>
                         ) : (
-                          <span>Apply (1-Click)</span>
+                          <span>Apply</span>
                         )}
                       </button>
                     </div>
@@ -794,59 +728,67 @@ function AdminSettingsContent() {
 
         {/* ============================================================== */}
         {/* SECTION 2: TYPOGRAPHY & FONT STYLE (30 CURATED ACADEMIC)       */}
+        {/* Clean, un-cluttered layout without duplicate buttons/badges    */}
         {/* ============================================================== */}
         {(activeTab === "typography" || activeTab === "all") && (
-          <div className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-2xs space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-              <div className="space-y-1">
+          <div className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-2xs space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+              <div>
                 <div className="flex items-center gap-2">
-                  <Type className="w-5 h-5 text-emerald-700" />
-                  <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">
-                    Section 2: Typography &amp; Font Style (30 Curated Academic Pairings)
+                  <Type className="w-4 h-4 text-emerald-700" />
+                  <h2 className="text-sm font-bold text-slate-900">
+                    Section 2: Typography &amp; Font Pairings
                   </h2>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                    30 Google Academic Fonts
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                    30 Font Styles
                   </span>
                 </div>
-                <p className="text-slate-500 text-xs">
-                  Select your preferred font pairing. Click &ldquo;Live Preview&rdquo; on any font style to inspect how headings, citations, and prose render in real time.
+                <p className="text-slate-500 text-xs mt-0.5">
+                  Click &ldquo;Live Preview&rdquo; on any typography style to test hierarchy and readability below.
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
-                <Link
-                  href="/design-preview"
-                  target="_blank"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors"
-                >
-                  <Compass className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Design Explorer</span>
-                  <ExternalLink className="w-3 h-3 text-slate-400" />
-                </Link>
-
-                <div className="p-2 rounded-lg border border-slate-200 bg-slate-50 flex items-center gap-2 text-xs">
-                  <span className="text-slate-500 font-medium">Currently Live:</span>
-                  <span className="font-bold text-slate-900" style={{ fontFamily: activeFontObj.headingFont }}>
-                    {activeFontObj.name}
-                  </span>
-                </div>
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  { id: "all", label: "All (30)" },
+                  { id: "Classical Serif", label: "Classical (8)" },
+                  { id: "Contemporary Serif", label: "Contemporary (8)" },
+                  { id: "Modern Technical Sans", label: "STEM Sans (8)" },
+                  { id: "Monospace & Architectural", label: "Monospace (6)" },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => setFontFilter(f.id)}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all ${
+                      fontFilter === f.id
+                        ? "bg-slate-900 text-white shadow-2xs"
+                        : "bg-slate-100 hover:bg-slate-200 text-slate-700"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Interactive Live Preview Box for Section 2 */}
-            <div className="rounded-xl border border-slate-300/80 bg-slate-50/60 p-4 sm:p-5 space-y-4 shadow-2xs">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-3">
+            {/* Streamlined Live Typography Sandbox for Section 2 */}
+            <div className="rounded-xl border border-slate-200/90 bg-slate-50/70 p-4 space-y-3 shadow-2xs">
+              <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <Type className="w-4 h-4 text-emerald-700" />
-                  <span className="text-xs font-bold text-slate-800 uppercase tracking-wide">
-                    Live Typography &amp; Readability Sandbox for Section 2
+                  <span className="text-xs font-bold text-slate-800">
+                    Typeface Specimen:
                   </span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 font-medium">
-                    Testing: {previewFontObj.name}
+                  <span
+                    className="text-xs font-extrabold text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-200 shadow-2xs"
+                    style={{ fontFamily: previewFontObj.headingFont }}
+                  >
+                    {previewFontObj.name}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div>
                   {previewFontId !== selectedFont ? (
                     <button
                       type="button"
@@ -859,60 +801,35 @@ function AdminSettingsContent() {
                       ) : (
                         <Sparkles className="w-3 h-3" />
                       )}
-                      <span>Apply This Tested Font Live</span>
+                      <span>Apply This Font Live</span>
                     </button>
                   ) : (
                     <span className="text-[11px] font-semibold text-emerald-700 flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
                       <Check className="w-3 h-3" />
-                      <span>This font style is currently live on your site</span>
+                      <span>Currently Live on Website</span>
                     </span>
                   )}
-
-                  <Link
-                    href="/design-preview"
-                    target="_blank"
-                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1"
-                  >
-                    <Compass className="w-3 h-3 text-slate-500" />
-                    <span>Design Explorer</span>
-                    <ExternalLink className="w-3 h-3 text-slate-400" />
-                  </Link>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsModalPreviewOpen(true)}
-                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1"
-                  >
-                    <Maximize2 className="w-3 h-3 text-slate-500" />
-                    <span>Expand</span>
-                  </button>
                 </div>
               </div>
 
-              {/* Typography Specimen Box rendered in current preview colors */}
+              {/* Typography Specimen Box */}
               <div
-                className="rounded-xl p-5 border transition-all duration-300 shadow-sm space-y-3"
+                className="rounded-xl p-4 sm:p-5 border transition-all duration-200 shadow-2xs space-y-2.5"
                 style={{
                   backgroundColor: previewThemeObj.cssVars.bgCanvas,
                   borderColor: previewThemeObj.cssVars.borderColor,
                   color: previewThemeObj.cssVars.textMain,
                 }}
               >
-                <div className="space-y-1">
-                  <span
-                    className="text-[10px] font-bold uppercase tracking-wider"
-                    style={{ color: previewThemeObj.cssVars.accentPrimary }}
-                  >
-                    Headline &amp; Academic Hierarchy Specimen
-                  </span>
+                <div>
                   <h1
-                    className="text-2xl sm:text-3xl font-bold tracking-tight"
+                    className="text-xl sm:text-2xl font-bold tracking-tight"
                     style={{ fontFamily: previewFontObj.headingFont }}
                   >
                     Dr. Abhishek Rajput
                   </h1>
                   <h2
-                    className="text-sm sm:text-base font-semibold italic"
+                    className="text-xs sm:text-sm font-semibold italic mt-0.5"
                     style={{
                       fontFamily: previewFontObj.headingFont,
                       color: previewThemeObj.cssVars.textMuted,
@@ -923,20 +840,14 @@ function AdminSettingsContent() {
                 </div>
 
                 <div
-                  className="p-3.5 rounded-lg border"
+                  className="p-3 rounded-lg border"
                   style={{
                     backgroundColor: previewThemeObj.cssVars.bgCard,
                     borderColor: previewThemeObj.cssVars.borderColor,
                   }}
                 >
-                  <div
-                    className="text-xs font-bold uppercase tracking-wide mb-1"
-                    style={{ color: previewThemeObj.cssVars.accentPrimary }}
-                  >
-                    Research Abstract Specimen ({previewFontObj.name})
-                  </div>
                   <p
-                    className="text-xs sm:text-sm leading-relaxed"
+                    className="text-xs leading-relaxed"
                     style={{
                       fontFamily: previewFontObj.bodyFont,
                       color: previewThemeObj.cssVars.textMain,
@@ -944,47 +855,12 @@ function AdminSettingsContent() {
                   >
                     &ldquo;Our laboratory investigates the fundamental mechanics governing high-velocity impact, adiabatic shear band formation, and dynamic fracture phenomena under extreme loading regimes in advanced heterogeneous alloys and 3D woven metamaterials.&rdquo;
                   </p>
-                  <div
-                    className="mt-2.5 pt-2 border-t flex flex-wrap items-center justify-between text-[11px]"
-                    style={{ borderColor: previewThemeObj.cssVars.borderColor }}
-                  >
-                    <span style={{ color: previewThemeObj.cssVars.textMuted }}>
-                      Heading Font: <strong className="font-bold">{previewFontObj.headingFont.split(",")[0]}</strong>
-                    </span>
-                    <span style={{ color: previewThemeObj.cssVars.textMuted }}>
-                      Body Font: <strong className="font-bold">{previewFontObj.bodyFont.split(",")[0]}</strong>
-                    </span>
-                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Font Category Filter Pills */}
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {[
-                { id: "all", label: `All Fonts (${fontList.length})` },
-                { id: "Classical Serif", label: "🏛️ Classical & Heritage (8)" },
-                { id: "Contemporary Serif", label: "📰 Contemporary & Scientific (8)" },
-                { id: "Modern Technical Sans", label: "⚡ Modern Technical & STEM (8)" },
-                { id: "Monospace & Architectural", label: "🔬 Monospace & Hybrids (6)" },
-              ].map((f) => (
-                <button
-                  key={f.id}
-                  type="button"
-                  onClick={() => setFontFilter(f.id)}
-                  className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
-                    fontFilter === f.id
-                      ? "bg-slate-900 text-white shadow-xs"
-                      : "bg-slate-100 hover:bg-slate-200 text-slate-700"
-                  }`}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
-
             {/* Font Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-1">
               {filteredFonts.map((f) => {
                 const isLive = selectedFont === f.id;
                 const isPreviewing = previewFontId === f.id;
@@ -993,80 +869,66 @@ function AdminSettingsContent() {
                   <div
                     key={f.id}
                     onClick={() => setPreviewFontId(f.id)}
-                    className={`p-4 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
+                    className={`p-3.5 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between space-y-2.5 ${
                       isLive
-                        ? "border-emerald-600 bg-emerald-50/20 shadow-md ring-2 ring-emerald-600/30"
+                        ? "border-emerald-600 bg-emerald-50/20 shadow-xs ring-2 ring-emerald-600/30"
                         : isPreviewing
-                        ? "border-blue-500 bg-blue-50/20 shadow-sm ring-2 ring-blue-400/20"
-                        : "border-slate-200 hover:border-slate-300 bg-white hover:shadow-xs"
+                        ? "border-blue-500 bg-blue-50/20 shadow-2xs ring-2 ring-blue-400/20"
+                        : "border-slate-200 hover:border-slate-300 bg-white"
                     }`}
                   >
-                    <div className="space-y-3">
-                      {/* Header Tags */}
+                    <div className="space-y-2">
                       <div className="flex items-center justify-between gap-1">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">
                           {f.category}
                         </span>
-                        <div className="flex items-center gap-1">
-                          {isPreviewing && !isLive && (
-                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 border border-blue-200">
-                              <Eye className="w-2.5 h-2.5" />
-                              <span>Previewing</span>
-                            </span>
-                          )}
-                          {isLive ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white">
-                              <Check className="w-3 h-3" />
-                              <span>Live</span>
-                            </span>
-                          ) : (
-                            <span className="w-4 h-4 rounded-full border border-slate-300" />
-                          )}
-                        </div>
+                        {isLive ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white">
+                            <Check className="w-3 h-3" />
+                            <span>Live</span>
+                          </span>
+                        ) : isPreviewing ? (
+                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700">
+                            <Eye className="w-2.5 h-2.5" />
+                            <span>Testing</span>
+                          </span>
+                        ) : (
+                          <span className="w-3.5 h-3.5 rounded-full border border-slate-300" />
+                        )}
                       </div>
 
-                      {/* Font Name */}
                       <div>
                         <h3
-                          className="font-bold text-base text-slate-900 leading-tight"
+                          className="font-bold text-sm text-slate-900 leading-tight"
                           style={{ fontFamily: f.headingFont }}
                         >
                           {f.name}
                         </h3>
-                        <span className="text-[10px] font-semibold text-emerald-800">
+                        <span className="text-[10px] font-medium text-emerald-800">
                           {f.tag}
                         </span>
                       </div>
 
-                      {/* Live Font Sample Showcase */}
-                      <div className="p-3 rounded-lg border border-slate-200/90 bg-slate-50/80 space-y-1">
+                      <div className="p-2.5 rounded-lg border border-slate-200/90 bg-slate-50 space-y-0.5">
                         <div
-                          className="text-base sm:text-lg font-bold text-slate-900 leading-snug"
+                          className="text-sm font-bold text-slate-900 leading-snug"
                           style={{ fontFamily: f.headingFont }}
                         >
                           Dr. Abhishek Rajput
                         </div>
                         <div
-                          className="text-xs text-slate-600 italic leading-relaxed"
+                          className="text-[11px] text-slate-600 italic"
                           style={{ fontFamily: f.headingFont }}
                         >
-                          Structural &amp; Impact Mechanics Lab
-                        </div>
-                        <div
-                          className="text-[11px] text-slate-500 pt-1 border-t border-slate-200/60"
-                          style={{ fontFamily: f.bodyFont }}
-                        >
-                          Sample body: Ballistic penetration &amp; extreme dynamic loading research.
+                          Impact Mechanics Lab
                         </div>
                       </div>
 
-                      {/* Description */}
-                      <p className="text-[11px] text-slate-500 leading-relaxed">
+                      <p className="text-[10px] text-slate-500 leading-relaxed line-clamp-2">
                         {f.description}
                       </p>
                     </div>
 
-                    {/* Action Buttons: Preview & 1-Click Apply */}
                     <div className="pt-2 border-t border-slate-100 flex items-center gap-2">
                       <button
                         type="button"
@@ -1077,7 +939,7 @@ function AdminSettingsContent() {
                         className="flex-1 py-1.5 px-2 rounded-lg text-[11px] font-bold border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 transition-colors flex items-center justify-center gap-1"
                       >
                         <Eye className="w-3 h-3 text-slate-500" />
-                        <span>Live Preview</span>
+                        <span>Preview</span>
                       </button>
 
                       <button
@@ -1099,7 +961,7 @@ function AdminSettingsContent() {
                             <span>Active</span>
                           </>
                         ) : (
-                          <span>Apply (1-Click)</span>
+                          <span>Apply</span>
                         )}
                       </button>
                     </div>
@@ -1115,36 +977,33 @@ function AdminSettingsContent() {
         {/* 3 Distinct Sub-Sections with ZERO Scrolling Required           */}
         {/* ============================================================== */}
         {(activeTab === "general" || activeTab === "all") && (
-          <div className="space-y-6">
-            <div className="border-b border-slate-200 pb-3">
-              <h2 className="text-base font-bold uppercase tracking-wider text-slate-900">
+          <div className="space-y-5">
+            <div className="border-b border-slate-200 pb-2.5">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">
                 Section 3: Website Content &amp; General Configuration
               </h2>
               <p className="text-slate-500 text-xs mt-0.5">
-                Edit the text parameters, public contact channels, and administrator authentication credentials in 3 dedicated sub-sections below.
+                Edit website identity, public contact channels, and administrator authentication.
               </p>
             </div>
 
-            <form onSubmit={handleSaveTextSettings} className="space-y-6 text-xs">
+            <form onSubmit={handleSaveTextSettings} className="space-y-5 text-xs">
               {/* -------------------------------------------------------- */}
               {/* SUB-SECTION 3.1: Identity & SEO Metadata                 */}
               {/* -------------------------------------------------------- */}
-              <div className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-2xs space-y-5">
-                <div className="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-                  <span className="p-2 rounded-lg bg-blue-50 text-blue-700 border border-blue-100">
-                    <Globe className="w-4 h-4" />
+              <div className="p-5 bg-white border border-slate-200/90 rounded-2xl shadow-2xs space-y-4">
+                <div className="flex items-center gap-2.5 border-b border-slate-100 pb-2.5">
+                  <span className="p-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-100">
+                    <Globe className="w-3.5 h-3.5" />
                   </span>
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900">
-                      Sub-section 3.1: Website Identity &amp; SEO Metadata
+                    <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
+                      Sub-section 3.1: Website Identity &amp; SEO
                     </h3>
-                    <p className="text-[11px] text-slate-500">
-                      Configure your primary website branding, page title, search engine meta descriptions, and copyright attribution.
-                    </p>
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3.5">
                   <div className="space-y-1">
                     <label className="font-bold text-slate-700">Website Title / Brand Headline</label>
                     <input
@@ -1155,27 +1014,21 @@ function AdminSettingsContent() {
                       placeholder="Dr. Abhishek Rajput | IIT Indore"
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:bg-white focus:border-emerald-600 focus:outline-none"
                     />
-                    <p className="text-[10px] text-slate-400">
-                      Appears in browser tabs, search engine indices, and header title navigation.
-                    </p>
                   </div>
 
                   <div className="space-y-1">
-                    <label className="font-bold text-slate-700">Meta Description (Search Engine Optimization)</label>
+                    <label className="font-bold text-slate-700">Meta Description (SEO)</label>
                     <textarea
                       value={settings.siteDescription || ""}
                       onChange={(e) => setSettings({ ...settings, siteDescription: e.target.value })}
-                      rows={3}
-                      placeholder="Official academic portal of Dr. Abhishek Rajput, Associate Professor at IIT Indore. Research in impact mechanics, dynamic fracture, and ballistic penetration."
+                      rows={2}
+                      placeholder="Official academic portal of Dr. Abhishek Rajput, Associate Professor at IIT Indore."
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:bg-white focus:border-emerald-600 focus:outline-none"
                     />
-                    <p className="text-[10px] text-slate-400">
-                      Provides summary snippets on Google Scholar, search engine crawlers, and social media link shares.
-                    </p>
                   </div>
 
                   <div className="space-y-1">
-                    <label className="font-bold text-slate-700">Footer Attribution &amp; Copyright Notice</label>
+                    <label className="font-bold text-slate-700">Footer Copyright Notice</label>
                     <input
                       type="text"
                       value={settings.footerText || ""}
@@ -1190,22 +1043,19 @@ function AdminSettingsContent() {
               {/* -------------------------------------------------------- */}
               {/* SUB-SECTION 3.2: Contact & Portal Modules                */}
               {/* -------------------------------------------------------- */}
-              <div className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-2xs space-y-5">
-                <div className="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-                  <span className="p-2 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100">
-                    <Mail className="w-4 h-4" />
+              <div className="p-5 bg-white border border-slate-200/90 rounded-2xl shadow-2xs space-y-4">
+                <div className="flex items-center gap-2.5 border-b border-slate-100 pb-2.5">
+                  <span className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100">
+                    <Mail className="w-3.5 h-3.5" />
                   </span>
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900">
-                      Sub-section 3.2: Public Communication &amp; Portal Modules
+                    <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
+                      Sub-section 3.2: Contact &amp; Feature Modules
                     </h3>
-                    <p className="text-[11px] text-slate-500">
-                      Specify public email contact channels and toggle major modular sections across the portal.
-                    </p>
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3.5">
                   <div className="space-y-1">
                     <label className="font-bold text-slate-700">Official Public Contact Email</label>
                     <input
@@ -1215,15 +1065,12 @@ function AdminSettingsContent() {
                       placeholder="abhishekrajput@iiti.ac.in"
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:bg-white focus:border-emerald-600 focus:outline-none"
                     />
-                    <p className="text-[10px] text-slate-400">
-                      Displayed on the public website footer, header contact links, and visitor inquiry modals.
-                    </p>
                   </div>
 
-                  <div className="pt-2 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="pt-2 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div
                       onClick={() => setSettings({ ...settings, enableNews: !settings.enableNews })}
-                      className={`p-3.5 rounded-xl border-2 cursor-pointer transition-all flex items-start gap-3 ${
+                      className={`p-3 rounded-xl border-2 cursor-pointer transition-all flex items-start gap-2.5 ${
                         settings.enableNews
                           ? "border-emerald-500 bg-emerald-50/20"
                           : "border-slate-200 bg-slate-50 opacity-70"
@@ -1231,24 +1078,24 @@ function AdminSettingsContent() {
                     >
                       <span className="mt-0.5">
                         {settings.enableNews ? (
-                          <ToggleRight className="w-5 h-5 text-emerald-600" />
+                          <ToggleRight className="w-4 h-4 text-emerald-600" />
                         ) : (
-                          <ToggleLeft className="w-5 h-5 text-slate-400" />
+                          <ToggleLeft className="w-4 h-4 text-slate-400" />
                         )}
                       </span>
                       <div className="space-y-0.5">
                         <div className="font-bold text-slate-800 text-xs">
-                          Enable News &amp; Updates Page
+                          News &amp; Updates Page
                         </div>
                         <p className="text-[10px] text-slate-500 leading-snug">
-                          Publishes alerts, conference announcements, and call for papers on the public website.
+                          Publish announcements and call for papers.
                         </p>
                       </div>
                     </div>
 
                     <div
                       onClick={() => setSettings({ ...settings, enableStudents: !settings.enableStudents })}
-                      className={`p-3.5 rounded-xl border-2 cursor-pointer transition-all flex items-start gap-3 ${
+                      className={`p-3 rounded-xl border-2 cursor-pointer transition-all flex items-start gap-2.5 ${
                         settings.enableStudents
                           ? "border-emerald-500 bg-emerald-50/20"
                           : "border-slate-200 bg-slate-50 opacity-70"
@@ -1256,17 +1103,17 @@ function AdminSettingsContent() {
                     >
                       <span className="mt-0.5">
                         {settings.enableStudents ? (
-                          <ToggleRight className="w-5 h-5 text-emerald-600" />
+                          <ToggleRight className="w-4 h-4 text-emerald-600" />
                         ) : (
-                          <ToggleLeft className="w-5 h-5 text-slate-400" />
+                          <ToggleLeft className="w-4 h-4 text-slate-400" />
                         )}
                       </span>
                       <div className="space-y-0.5">
                         <div className="font-bold text-slate-800 text-xs">
-                          Enable Research Group &amp; Lab Page
+                          Research Group &amp; Lab Page
                         </div>
                         <p className="text-[10px] text-slate-500 leading-snug">
-                          Displays the directory of current PhD scholars, MTech researchers, and alumni profiles.
+                          Directory of scholars and alumni profiles.
                         </p>
                       </div>
                     </div>
@@ -1277,23 +1124,20 @@ function AdminSettingsContent() {
               {/* -------------------------------------------------------- */}
               {/* SUB-SECTION 3.3: Administrator Identity & Security       */}
               {/* -------------------------------------------------------- */}
-              <div className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-2xs space-y-5">
-                <div className="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-                  <span className="p-2 rounded-lg bg-amber-50 text-amber-700 border border-amber-100">
-                    <ShieldCheck className="w-4 h-4" />
+              <div className="p-5 bg-white border border-slate-200/90 rounded-2xl shadow-2xs space-y-4">
+                <div className="flex items-center gap-2.5 border-b border-slate-100 pb-2.5">
+                  <span className="p-1.5 rounded-lg bg-amber-50 text-amber-700 border border-amber-100">
+                    <ShieldCheck className="w-3.5 h-3.5" />
                   </span>
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900">
-                      Sub-section 3.3: Administrator Identity &amp; Security Credentials
+                    <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
+                      Sub-section 3.3: Administrator Account &amp; Security
                     </h3>
-                    <p className="text-[11px] text-slate-500">
-                      Manage the administrator display name, login email, and authentication password used to access this CMS.
-                    </p>
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-3.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div className="space-y-1">
                       <label className="font-bold text-slate-700 flex items-center gap-1.5">
                         <User className="w-3.5 h-3.5 text-slate-400" />
@@ -1323,14 +1167,14 @@ function AdminSettingsContent() {
                     </div>
                   </div>
 
-                  <div className="pt-3 border-t border-slate-100 space-y-4">
+                  <div className="pt-2.5 border-t border-slate-100 space-y-3">
                     <div className="space-y-1">
                       <label className="font-bold text-slate-700 flex items-center gap-1.5">
                         <Key className="w-3.5 h-3.5 text-slate-400" />
                         <span>
                           Current Password{" "}
                           <span className="text-slate-400 font-normal">
-                            (Required only if changing login email or password)
+                            (Required only to change login credentials)
                           </span>
                         </span>
                       </label>
@@ -1343,7 +1187,7 @@ function AdminSettingsContent() {
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 max-w-xl">
                       <div className="space-y-1">
                         <label className="font-bold text-slate-700">
                           New Password <span className="text-slate-400 font-normal">(Optional)</span>
@@ -1373,14 +1217,14 @@ function AdminSettingsContent() {
               </div>
 
               {/* Master Save Button for Section 3 Text Parameters */}
-              <div className="flex justify-end pt-2">
+              <div className="flex justify-end pt-1">
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-xs transition-colors flex items-center gap-2 text-xs"
+                  className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-xs transition-colors flex items-center gap-2 text-xs"
                 >
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                  <span>Save All Text Settings &amp; Security</span>
+                  <span>Save All Website Settings</span>
                 </button>
               </div>
             </form>
@@ -1390,13 +1234,12 @@ function AdminSettingsContent() {
 
       {/* ============================================================== */}
       {/* FULLSCREEN / MODAL LIVE PREVIEW COMPONENT                      */}
-      {/* Allows testing any combinations in rich overlay window         */}
       {/* ============================================================== */}
       {isModalPreviewOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in">
           <div className="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-slate-700">
             {/* Modal Header */}
-            <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+            <div className="px-6 py-3.5 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
               <div className="flex items-center gap-3">
                 <span className="p-1.5 rounded-lg bg-emerald-600 text-white">
                   <Sparkles className="w-4 h-4" />
@@ -1428,7 +1271,7 @@ function AdminSettingsContent() {
                   ) : (
                     <Check className="w-3.5 h-3.5" />
                   )}
-                  <span>Apply This Combination Live</span>
+                  <span>Apply Combination Live</span>
                 </button>
 
                 <button
@@ -1620,16 +1463,16 @@ function AdminSettingsContent() {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-3 bg-slate-100 border-t border-slate-200 flex items-center justify-between text-xs">
+            <div className="px-6 py-2.5 bg-slate-100 border-t border-slate-200 flex items-center justify-between text-xs">
               <span className="text-slate-500">
                 You can try all 30 themes × 30 fonts (900 combinations) in real time.
               </span>
               <button
                 type="button"
                 onClick={() => setIsModalPreviewOpen(false)}
-                className="px-4 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold transition-colors"
+                className="px-3.5 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold transition-colors"
               >
-                Close Preview
+                Close
               </button>
             </div>
           </div>
