@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   LayoutDashboard,
   User,
@@ -17,22 +17,14 @@ import {
   Settings,
   LogOut,
   ExternalLink,
-  ShieldAlert,
+  Palette,
+  Type,
 } from "lucide-react";
 
-export default function AdminSidebar() {
+function SidebarNav() {
   const pathname = usePathname();
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    try {
-      await fetch("/api/auth/logout", { method: "POST" });
-      router.push("/admin/login");
-      router.refresh();
-    } catch (err) {
-      console.error("Logout failed:", err);
-    }
-  };
+  const searchParams = useSearchParams();
+  const currentTab = searchParams.get("tab") || "themes";
 
   const menuSections = [
     {
@@ -56,12 +48,66 @@ export default function AdminSidebar() {
       ],
     },
     {
-      title: "PREFERENCES",
+      title: "PREFERENCES & APPEARANCE",
       items: [
-        { name: "Website Settings", href: "/admin/settings", icon: Settings },
+        { name: "Color & Themes (30)", href: "/admin/settings?tab=themes", icon: Palette },
+        { name: "Typography & Fonts (30)", href: "/admin/settings?tab=typography", icon: Type },
+        { name: "Website Info & Text", href: "/admin/settings?tab=general", icon: Settings },
       ],
     },
   ];
+
+  return (
+    <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
+      {menuSections.map((section, idx) => (
+        <div key={idx} className="space-y-1.5">
+          <span className="px-3 text-[10px] font-bold tracking-wider uppercase text-slate-500">
+            {section.title}
+          </span>
+          <div className="space-y-0.5">
+            {section.items.map((item) => {
+              let active = false;
+              if (item.href.includes("?tab=")) {
+                const targetTab = item.href.split("?tab=")[1];
+                active = pathname === "/admin/settings" && currentTab === targetTab;
+              } else {
+                active = pathname === item.href && pathname !== "/admin/settings";
+              }
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                    active
+                      ? "bg-emerald-600/20 text-emerald-400 border border-emerald-500/30"
+                      : "text-slate-400 hover:text-slate-100 hover:bg-slate-900"
+                  }`}
+                >
+                  <Icon className={`w-4 h-4 ${active ? "text-emerald-400" : "text-slate-400"}`} />
+                  <span>{item.name}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function AdminSidebar() {
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.push("/admin/login");
+      router.refresh();
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  };
 
   return (
     <aside className="w-64 bg-slate-950 text-slate-300 flex flex-col h-screen sticky top-0 border-r border-slate-800 shrink-0 select-none">
@@ -80,36 +126,10 @@ export default function AdminSidebar() {
         </div>
       </div>
 
-      {/* Navigation List */}
-      <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
-        {menuSections.map((section, idx) => (
-          <div key={idx} className="space-y-1.5">
-            <span className="px-3 text-[10px] font-bold tracking-wider uppercase text-slate-500">
-              {section.title}
-            </span>
-            <div className="space-y-0.5">
-              {section.items.map((item) => {
-                const active = pathname === item.href;
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
-                      active
-                        ? "bg-emerald-600/20 text-emerald-400 border border-emerald-500/30"
-                        : "text-slate-400 hover:text-slate-100 hover:bg-slate-900"
-                    }`}
-                  >
-                    <Icon className={`w-4 h-4 ${active ? "text-emerald-400" : "text-slate-400"}`} />
-                    <span>{item.name}</span>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* Navigation List wrapped in Suspense */}
+      <Suspense fallback={<div className="flex-1 px-4 py-5" />}>
+        <SidebarNav />
+      </Suspense>
 
       {/* Footer / Quick Actions */}
       <div className="p-4 border-t border-slate-800/80 bg-slate-900/40 space-y-2">
