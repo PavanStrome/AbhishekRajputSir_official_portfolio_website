@@ -1,0 +1,215 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String    @id @default(cuid())
+  email               String    @unique
+  password            String
+  name                String
+  role                String    @default("ADMIN")
+  failedLoginAttempts Int       @default(0)
+  lockoutUntil        DateTime?
+  resetTokenHash      String?
+  resetTokenExpiry    DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+}
+
+model Profile {
+  id                 String    @id @default(cuid())
+  name               String
+  title              String
+  designation        String
+  department         String
+  institution        String
+  location           String
+  shortBio           String    @db.Text
+  bio                String    @db.Text
+  avatarUrl          String?
+  email              String
+  phone              String?
+  office             String?
+  officeHours        String?
+  researchInterests  String?   @db.Text
+  googleScholarUrl   String?
+  orcidUrl           String?
+  researchGateUrl    String?
+  linkedinUrl        String?
+  githubUrl          String?
+  personalWebsiteUrl String?
+  scopusUrl          String?
+  cvUrl              String?
+  cvUpdatedAt        DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model Education {
+  id          String   @id @default(cuid())
+  degree      String
+  field       String
+  institution String
+  year        String
+  location    String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AcademicPosition {
+  id          String   @id @default(cuid())
+  title       String
+  institution String
+  department  String?
+  startYear   String
+  endYear     String?
+  isCurrent   Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ResearchArea {
+  id           String        @id @default(cuid())
+  title        String
+  slug         String        @unique
+  summary      String        @db.Text
+  description  String        @db.Text
+  imageUrl     String?
+  keywords     String?
+  order        Int           @default(0)
+  isPublished  Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  publications Publication[]
+}
+
+model Publication {
+  id              String        @id @default(cuid())
+  title           String
+  authors         String
+  publicationType String        @default("JOURNAL") // JOURNAL, CONFERENCE, BOOK_CHAPTER, BOOK, OTHER
+  venue           String
+  year            Int
+  month           String?
+  volume          String?
+  issue           String?
+  pages           String?
+  doi             String?
+  paperUrl        String?
+  pdfUrl          String?
+  scholarUrl      String?
+  abstract        String?       @db.Text
+  isFeatured      Boolean       @default(false)
+  status          String        @default("PUBLISHED") // DRAFT, PUBLISHED
+  order           Int           @default(0)
+  researchAreaId  String?
+  researchArea    ResearchArea? @relation(fields: [researchAreaId], references: [id], onDelete: SetNull)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Project {
+  id                  String   @id @default(cuid())
+  title               String
+  slug                String   @unique
+  shortDescription    String   @db.Text
+  detailedDescription String   @db.Text
+  status              String   @default("ONGOING") // ONGOING, COMPLETED
+  role                String   @default("Principal Investigator")
+  fundingAgency       String?
+  grantAmount         String?
+  startDate           String?
+  endDate             String?
+  projectUrl          String?
+  imageUrl            String?
+  isFeatured          Boolean  @default(false)
+  isPublished         Boolean  @default(true)
+  order               Int      @default(0)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model Course {
+  id           String   @id @default(cuid())
+  code         String
+  title        String
+  semester     String
+  academicYear String
+  level        String   @default("Undergraduate / Postgraduate")
+  description  String   @db.Text
+  syllabusUrl  String?
+  courseUrl    String?
+  isPublished  Boolean  @default(true)
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Student {
+  id             String   @id @default(cuid())
+  name           String
+  category       String   @default("PHD") // PHD, MASTERS, UNDERGRAD, ALUMNI, STAFF
+  researchArea   String?
+  degree         String?
+  joiningYear    String?
+  graduationYear String?
+  status         String   @default("CURRENT") // CURRENT, GRADUATED
+  photoUrl       String?
+  bio            String?  @db.Text
+  websiteUrl     String?
+  linkedinUrl    String?
+  scholarUrl     String?
+  email          String?
+  order          Int      @default(0)
+  isPublished    Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Award {
+  id             String   @id @default(cuid())
+  title          String
+  organization   String
+  year           String
+  description    String?  @db.Text
+  certificateUrl String?
+  isFeatured     Boolean  @default(false)
+  isPublished    Boolean  @default(true)
+  order          Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model News {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  date        DateTime @default(now())
+  content     String   @db.Text
+  category    String   @default("ANNOUNCEMENT") // ANNOUNCEMENT, PAPER, GRANT, TALK, AWARD
+  imageUrl    String?
+  externalUrl String?
+  isFeatured  Boolean  @default(false)
+  status      String   @default("PUBLISHED") // DRAFT, PUBLISHED
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SiteSettings {
+  id              String   @id @default(cuid())
+  siteTitle       String   @default("Prof. Abhishek Rajput | IIT Indore")
+  siteDescription String   @default("Academic Portfolio and Research Group of Dr. Abhishek Rajput at Indian Institute of Technology Indore.")
+  contactEmail    String   @default("abhishekrajput@iiti.ac.in")
+  footerText      String?
+  enableNews      Boolean  @default(true)
+  enableStudents  Boolean  @default(true)
+  updatedAt       DateTime @updatedAt
+}
