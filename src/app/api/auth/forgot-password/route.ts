@@ -3,43 +3,68 @@ import crypto from "crypto";
 import prisma from "@/lib/prisma";
 import { sendPasswordResetEmail } from "@/lib/email";
 
-// GET: Basic health check; does not expose sensitive administrator details openly
-export async function GET() {
-  return NextResponse.json({ success: true });
+function maskEmail(email: string): string {
+  const [user, domain] = email.split("@");
+  if (!user || !domain) return email;
+  const prefix = user.slice(0, Math.min(2, user.length));
+  const suffix = user.length > 3 ? user.slice(-1) : "";
+  return `${prefix}••••${suffix}@${domain}`;
 }
 
-// POST: Dispatches the reset link exclusively to the registered administrator's email inbox
+// GET: Returns the masked registered admin email so the user knows where the email will be sent
+export async function GET() {
+  try {
+    const admin =
+      (await prisma.user.findFirst({ where: { role: "ADMIN" } })) ||
+      (await prisma.user.findFirst());
+
+    if (!admin) {
+      return NextResponse.json({ error: "No administrator account configured." }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      success: true,
+      maskedEmail: maskEmail(admin.email),
+      adminName: admin.name,
+    });
+  } catch (error) {
+    console.error("Forgot password GET error:", error);
+    return NextResponse.json({ error: "Failed to load registered account details." }, { status: 500 });
+  }
+}
+
+// POST: Dispatches the reset link directly to the registered administrator's email inbox
 export async function POST(req: NextRequest) {
   try {
     let targetEmail: string | undefined;
 
+    // Read body if provided
     try {
       const body = await req.json();
       if (body && body.email && typeof body.email === "string" && body.email.includes("@")) {
         targetEmail = body.email.trim().toLowerCase();
       }
     } catch {
-      // Empty body
+      // Body may be empty if one-click button is used
     }
 
-    if (!targetEmail) {
-      return NextResponse.json(
-        { error: "Please enter your registered administrator email address." },
-        { status: 400 }
-      );
-    }
-
-    // Find administrator by email
-    const admin = await prisma.user.findFirst({
-      where: { email: { equals: targetEmail, mode: "insensitive" } },
-    });
-
-    // To prevent account enumeration, return success message even if email not found
-    if (!admin) {
-      return NextResponse.json({
-        success: true,
-        message: "If an administrator account with this email exists, a secure password reset link has been dispatched to your email address.",
+    // If specific email provided, find that user; otherwise find the registered administrator
+    let admin = null;
+    if (targetEmail) {
+      admin = await prisma.user.findFirst({
+        where: { email: { equals: targetEmail, mode: "insensitive" } },
       });
+    } else {
+      admin =
+        (await prisma.user.findFirst({ where: { role: "ADMIN" } })) ||
+        (await prisma.user.findFirst());
+    }
+
+    if (!admin) {
+      return NextResponse.json(
+        { error: "No registered administrator account found in the system." },
+        { status: 404 }
+      );
     }
 
     // Cooldown check: prevent rapid spamming within 60 seconds
@@ -48,7 +73,8 @@ export async function POST(req: NextRequest) {
       if (remainingMs > 14 * 60 * 1000) {
         return NextResponse.json({
           success: true,
-          message: "A password reset link was already sent recently. Please check your email inbox or wait a moment before requesting another.",
+          sentTo: maskEmail(admin.email),
+          message: `A password reset link was already sent recently to ${maskEmail(admin.email)}. Please check your inbox or wait a moment before requesting another.`,
         });
       }
     }
@@ -59,7 +85,7 @@ export async function POST(req: NextRequest) {
     // Compute SHA-256 hash for database storage
     const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
 
-    // Set strict 15-minute expiration
+    // Set 15-minute expiration
     const tokenExpiry = new Date(Date.now() + 15 * 60 * 1000);
 
     // Save token hash and expiry to user
@@ -71,7 +97,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Construct reset URL (sent exclusively via email)
+    // Construct reset URL (delivered ONLY via email)
     const host = req.headers.get("host") || "localhost:3000";
     const protocol = req.headers.get("x-forwarded-proto") || (host.includes("localhost") ? "http" : "https");
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
@@ -86,10 +112,12 @@ export async function POST(req: NextRequest) {
 
     console.log(`✉️ Password reset email dispatched to: ${admin.email} (mode: ${emailResult.mode})`);
 
-    // Strictly return generic success without exposing the reset URL or token to the client
+    // Strictly send only to mail; NEVER return resetUrl or devResetUrl to the client browser
     return NextResponse.json({
       success: true,
-      message: "A secure password reset link has been dispatched directly to your registered email address. Please check your email inbox and spam folder.",
+      sentTo: maskEmail(admin.email),
+      deliveryMode: emailResult.mode,
+      message: `A secure password reset link has been dispatched directly to the registered administrator email (${maskEmail(admin.email)}). Please check your inbox.`,
     });
   } catch (error) {
     console.error("Forgot password handler error:", error);
