@@ -1,42 +1,31 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { KeyRound, Mail, ArrowRight, AlertCircle, Loader2, ArrowLeft, ShieldCheck, UserCheck } from "lucide-react";
+import { KeyRound, Mail, ArrowRight, AlertCircle, Loader2, ArrowLeft, ShieldCheck } from "lucide-react";
 
 export default function ForgotPasswordPage() {
-  const [adminInfo, setAdminInfo] = useState<{ maskedEmail: string; adminName: string } | null>(null);
-  const [loadingInfo, setLoadingInfo] = useState(true);
+  const [email, setEmail] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [dispatchedTo, setDispatchedTo] = useState<string | null>(null);
-  const [devResetUrl, setDevResetUrl] = useState<string | null>(null);
-  const [deliveryMode, setDeliveryMode] = useState<"smtp" | "console" | null>(null);
+  const [dispatched, setDispatched] = useState(false);
 
-  useEffect(() => {
-    fetch("/api/auth/forgot-password")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success && data.maskedEmail) {
-          setAdminInfo({
-            maskedEmail: data.maskedEmail,
-            adminName: data.adminName || "Administrator",
-          });
-        }
-      })
-      .catch((err) => console.error("Failed to load registered admin info:", err))
-      .finally(() => setLoadingInfo(false));
-  }, []);
-
-  const handleSendReset = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError(null);
+
+    if (!email.trim() || !email.includes("@")) {
+      setError("Please enter a valid administrator email address.");
+      return;
+    }
+
     setSending(true);
 
     try {
       const res = await fetch("/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}), // Empty body triggers dispatch to registered admin
+        body: JSON.stringify({ email: email.trim() }),
       });
 
       const data = await res.json();
@@ -44,9 +33,7 @@ export default function ForgotPasswordPage() {
         throw new Error(data.error || "Failed to dispatch reset email.");
       }
 
-      setDispatchedTo(data.sentTo || adminInfo?.maskedEmail || "your registered email");
-      if (data.devResetUrl) setDevResetUrl(data.devResetUrl);
-      if (data.deliveryMode) setDeliveryMode(data.deliveryMode);
+      setDispatched(true);
     } catch (err: any) {
       setError(err.message || "An error occurred while dispatching the reset email.");
     } finally {
@@ -77,7 +64,7 @@ export default function ForgotPasswordPage() {
             Reset Admin Password
           </h1>
           <p className="text-xs text-slate-400 leading-relaxed">
-            A secure, time-limited reset link will be sent directly to your registered administrator email address.
+            Enter your registered administrator email address. We will send a secure, one-time reset link directly to your inbox.
           </p>
         </div>
 
@@ -89,69 +76,28 @@ export default function ForgotPasswordPage() {
           </div>
         )}
 
-        {/* Success State: Email Dispatched */}
-        {dispatchedTo ? (
+        {/* Dispatched State: Instructions to check email */}
+        {dispatched ? (
           <div className="p-6 bg-emerald-950/30 border border-emerald-800/80 rounded-xl space-y-4 animate-in fade-in text-center">
             <div className="w-12 h-12 rounded-full bg-emerald-600/20 text-emerald-400 flex items-center justify-center mx-auto">
               <Mail className="w-6 h-6" />
             </div>
             <div className="space-y-1.5">
-              <h3 className="text-sm font-bold text-white">Reset Link Dispatched!</h3>
+              <h3 className="text-base font-bold text-white">Check Your Email Inbox</h3>
               <p className="text-xs text-slate-300 leading-relaxed">
-                We have generated a secure password reset link sent directly to your registered email:
+                A secure password reset link has been dispatched to your email address.
               </p>
-              <div className="py-1 px-3 bg-slate-950/80 rounded-lg inline-block text-emerald-400 font-mono text-xs font-semibold">
-                {dispatchedTo}
-              </div>
             </div>
 
-            <div className="p-3 bg-slate-950/60 rounded-lg text-[11px] text-slate-400 text-left space-y-1">
-              <div className="flex items-center gap-1.5 text-slate-300 font-semibold">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Next Steps:</span>
+            <div className="p-3.5 bg-slate-950/80 border border-slate-800/80 rounded-lg text-[11px] text-slate-300 text-left space-y-1.5">
+              <div className="flex items-center gap-1.5 text-emerald-400 font-semibold">
+                <ShieldCheck className="w-4 h-4 shrink-0" />
+                <span>Security Instructions:</span>
               </div>
-              <p>• Open your email inbox and click the reset link.</p>
+              <p>• Open your email inbox and click the verified reset link.</p>
               <p>• The link is valid for <strong>15 minutes</strong> and can only be used once.</p>
-              <p>• If you do not see it within a few moments, check your spam folder.</p>
+              <p>• If you do not see it within a few moments, check your spam or junk folder.</p>
             </div>
-
-            {/* Gmail SMTP Notice if email was logged locally */}
-            {deliveryMode !== "smtp" && (
-              <div className="p-3 bg-amber-950/40 border border-amber-800/80 rounded-xl text-left space-y-1.5 text-[11px] text-amber-200">
-                <div className="font-semibold text-amber-300 flex items-center gap-1.5">
-                  <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>Why didn't an email arrive in your Gmail inbox?</span>
-                </div>
-                <p className="text-slate-300 leading-relaxed text-[11px]">
-                  Google rejects standard account passwords for automated emails. It requires a <strong>16-character Google App Password</strong> in your <code className="text-amber-300 font-mono">.env</code> file.
-                </p>
-                <p className="text-slate-400 text-[10px]">
-                  To receive real emails directly: Go to <strong>myaccount.google.com/apppasswords</strong>, generate a 16-character App Password, and paste it as <code className="text-amber-300 font-mono">SMTP_PASS</code> in <code className="text-amber-300 font-mono">.env</code>.
-                </p>
-              </div>
-            )}
-
-            {/* Development / Local Testing Direct Link */}
-            {devResetUrl && (
-              <div className="p-3 bg-slate-950 border border-emerald-700/60 rounded-xl text-left space-y-2 text-[11px]">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-emerald-300">⚡ Direct Password Reset Link</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
-                    Active (15 mins)
-                  </span>
-                </div>
-                <p className="text-slate-400 text-[11px]">
-                  You can proceed immediately to set your new password using this verified one-time link:
-                </p>
-                <a
-                  href={devResetUrl}
-                  className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition-colors text-xs shadow-md"
-                >
-                  <span>Open Password Reset Form Now</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </a>
-              </div>
-            )}
 
             <Link
               href="/admin/login"
@@ -161,60 +107,46 @@ export default function ForgotPasswordPage() {
             </Link>
           </div>
         ) : (
-          /* Direct Dispatch Form */
-          <div className="space-y-5">
-            {/* Registered Admin Card */}
-            <div className="p-4 bg-slate-950/80 border border-slate-800 rounded-xl space-y-2">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-400 flex items-center gap-1.5 font-medium">
-                  <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Registered Faculty Admin</span>
-                </span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800/60">
-                  Verified
-                </span>
+          /* Email Input Form */
+          <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+            <div className="space-y-1.5">
+              <label className="block font-semibold uppercase tracking-wider text-slate-400">
+                Registered Administrator Email
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="faculty@iiti.ac.in"
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder:text-slate-600 focus:border-emerald-500 focus:outline-none transition-colors"
+                />
               </div>
-
-              {loadingInfo ? (
-                <div className="flex items-center gap-2 text-xs text-slate-500 py-1">
-                  <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-500" />
-                  <span>Fetching registered administrator account...</span>
-                </div>
-              ) : (
-                <div className="space-y-0.5">
-                  <strong className="block text-sm font-semibold text-white">
-                    {adminInfo?.adminName || "Dr. Abhishek Rajput"}
-                  </strong>
-                  <p className="text-xs font-mono text-emerald-400">
-                    {adminInfo?.maskedEmail || "Registered Administrator Email"}
-                  </p>
-                </div>
-              )}
+              <p className="text-[11px] text-slate-500">
+                The password reset link will only be delivered to this verified email address.
+              </p>
             </div>
 
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Click the button below to generate a single-use password reset link and send it directly to the registered email address above.
-            </p>
-
             <button
-              type="button"
-              onClick={handleSendReset}
-              disabled={sending || loadingInfo}
-              className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg shadow-sm transition-all flex items-center justify-center gap-2 text-xs disabled:opacity-50"
+              type="submit"
+              disabled={sending}
+              className="w-full mt-2 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg shadow-sm transition-all flex items-center justify-center gap-2 text-xs disabled:opacity-50"
             >
               {sending ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Sending Reset Email...</span>
+                  <span>Dispatching Email...</span>
                 </>
               ) : (
                 <>
-                  <span>Send Reset Link to Registered Email</span>
+                  <span>Send Password Reset Link</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
-          </div>
+          </form>
         )}
 
         <div className="pt-4 border-t border-slate-800 text-center text-xs text-slate-400">
