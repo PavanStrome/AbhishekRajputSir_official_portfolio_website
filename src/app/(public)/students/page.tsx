@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "Ph.D. candidates, M.Tech scholars, and research personnel in the Structural & Impact Mechanics Laboratory at IIT Indore.",
 };
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function StudentsPage() {
   const students = await getPublicStudents();

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "Peer-reviewed journal articles, conference proceedings, and book chapters published by Dr. Abhishek Rajput in impact mechanics and materials engineering.",
 };
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function PublicationsPage() {
   const [publications, researchAreas] = await Promise.all([

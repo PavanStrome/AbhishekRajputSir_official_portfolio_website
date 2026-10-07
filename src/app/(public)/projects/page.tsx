@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "Government, institutional, and industrial sponsored research projects led by Dr. Abhishek Rajput at IIT Indore.",
 };
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function ProjectsPage() {
   const projects = await getPublicProjects();

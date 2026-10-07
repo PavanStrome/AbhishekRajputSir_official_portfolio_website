@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 
     const cleanEmail = email.trim().toLowerCase();
     const user = await prisma.user.findFirst({
-      where: { email: { equals: cleanEmail, mode: "insensitive" } },
+      where: { email: cleanEmail },
     });
 
     if (!user || !user.resetTokenHash || !user.resetTokenExpiry) {

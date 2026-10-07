@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     let admin = null;
     if (targetEmail) {
       admin = await prisma.user.findFirst({
-        where: { email: { equals: targetEmail, mode: "insensitive" } },
+        where: { email: targetEmail },
       });
     } else {
       admin =

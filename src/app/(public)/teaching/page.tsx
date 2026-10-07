@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "Curriculum and courses taught in structural mechanics, reinforced concrete, and finite element modeling at IIT Indore.",
 };
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function TeachingPage() {
   const courses = await getPublicCourses();

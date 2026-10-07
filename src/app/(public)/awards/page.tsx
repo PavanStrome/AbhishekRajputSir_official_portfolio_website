@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     "Competitive fellowships, scientific recognitions, and research grants awarded to Dr. Abhishek Rajput.",
 };
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function AwardsPage() {
   const awards = await getPublicAwards();

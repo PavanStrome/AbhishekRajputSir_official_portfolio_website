@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "Experimental and computational research areas in structural impact mechanics, ballistic penetration, and finite element modeling at IIT Indore.",
 };
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function ResearchPage() {
   const researchAreas = await getPublicResearchAreas();

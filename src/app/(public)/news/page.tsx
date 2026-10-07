@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     "Recent publications, invited talks, seminar presentations, and research updates from Dr. Abhishek Rajput's laboratory.",
 };
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function NewsPage() {
   const news = await getPublicNews();

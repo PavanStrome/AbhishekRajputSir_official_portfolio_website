@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     "Office hours, campus location, email address, and academic profiles for Dr. Abhishek Rajput at IIT Indore.",
 };
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function ContactPage() {
   const { profile } = await getPublicProfile();

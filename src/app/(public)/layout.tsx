@@ -5,6 +5,8 @@ import NewsTicker from "@/components/public/NewsTicker";
 import { getPublicProfile, getPublicSiteSettings, getPublicNews } from "@/services/academic-service";
 import { getTheme, getFontStyle } from "@/lib/themes";
 
+export const dynamic = "force-dynamic";
+
 export default async function PublicLayout({
   children,
 }: {
