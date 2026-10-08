@@ -910,8 +910,18 @@ export const ACADEMIC_FONT_STYLES: Record<string, FontStyleDefinition> = {
   },
 
   // ------------------------------------------
-  // Group 3: Modern Technical & STEM Sans (8)
+  // Group 3: Modern Technical & STEM Sans
   // ------------------------------------------
+  "ce612-bold-sans": {
+    id: "ce612-bold-sans",
+    name: "CE 612 Bold Geometric Sans",
+    category: "Modern Technical Sans",
+    tag: "CE 612 Style",
+    headingFont: "'Plus Jakarta Sans', 'Inter', 'Montserrat', system-ui, sans-serif",
+    bodyFont: "'Inter', system-ui, sans-serif",
+    previewSample: "CE 612 — Structural Dynamics & Impact Mechanics",
+    description: "Exact bold neo-grotesque geometric sans as seen in official IIT Indore CE 612 course slides and materials.",
+  },
   "plus-jakarta": {
     id: "plus-jakarta",
     name: "MIT & Stanford Neo-Grotesque",

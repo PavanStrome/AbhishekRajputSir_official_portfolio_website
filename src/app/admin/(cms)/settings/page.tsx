@@ -740,7 +740,7 @@ function AdminSettingsContent() {
                     Section 2: Typography &amp; Font Pairings
                   </h2>
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
-                    30 Font Styles
+                    {fontList.length} Font Styles
                   </span>
                 </div>
                 <p className="text-slate-500 text-xs mt-0.5">
@@ -750,11 +750,11 @@ function AdminSettingsContent() {
 
               <div className="flex flex-wrap gap-1.5">
                 {[
-                  { id: "all", label: "All (30)" },
-                  { id: "Classical Serif", label: "Classical (8)" },
-                  { id: "Contemporary Serif", label: "Contemporary (8)" },
-                  { id: "Modern Technical Sans", label: "STEM Sans (8)" },
-                  { id: "Monospace & Architectural", label: "Monospace (6)" },
+                  { id: "all", label: `All (${fontList.length})` },
+                  { id: "Classical Serif", label: `Classical (${fontList.filter((f) => f.category === "Classical Serif").length})` },
+                  { id: "Contemporary Serif", label: `Contemporary (${fontList.filter((f) => f.category === "Contemporary Serif").length})` },
+                  { id: "Modern Technical Sans", label: `STEM Sans (${fontList.filter((f) => f.category === "Modern Technical Sans").length})` },
+                  { id: "Monospace & Architectural", label: `Monospace (${fontList.filter((f) => f.category === "Monospace & Architectural").length})` },
                 ].map((f) => (
                   <button
                     key={f.id}
