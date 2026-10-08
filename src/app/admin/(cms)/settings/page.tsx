@@ -394,7 +394,7 @@ function AdminSettingsContent() {
             }`}
           >
             <Palette className="w-3.5 h-3.5" />
-            <span>1. Color &amp; Themes (30)</span>
+            <span>1. Color &amp; Themes ({themeList.length})</span>
           </button>
 
           <button
@@ -407,7 +407,7 @@ function AdminSettingsContent() {
             }`}
           >
             <Type className="w-3.5 h-3.5" />
-            <span>2. Typography &amp; Fonts (30)</span>
+            <span>2. Typography &amp; Fonts ({fontList.length})</span>
           </button>
 
           <button
@@ -438,7 +438,7 @@ function AdminSettingsContent() {
         </div>
 
         {/* ============================================================== */}
-        {/* SECTION 1: WEBSITE THEME & COLOR PALETTE (30 CURATED DESIGNS)  */}
+        {/* SECTION 1: WEBSITE THEME & COLOR PALETTE                       */}
         {/* Clean, un-cluttered layout without duplicate buttons/badges    */}
         {/* ============================================================== */}
         {(activeTab === "themes" || activeTab === "all") && (
@@ -451,7 +451,7 @@ function AdminSettingsContent() {
                     Section 1: Academic Color Themes
                   </h2>
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
-                    30 Palettes
+                    {themeList.length} Palettes
                   </span>
                 </div>
                 <p className="text-slate-500 text-xs mt-0.5">
@@ -461,13 +461,13 @@ function AdminSettingsContent() {
 
               <div className="flex items-center gap-1.5 flex-wrap">
                 {[
-                  { id: "all", label: "All (30)" },
-                  { id: "pinned", label: "📌 Pinned (2)" },
-                  { id: "Archival & Editorial", label: "Archival (5)" },
-                  { id: "Prestigious Universities", label: "Universities (6)" },
-                  { id: "Modern Minimalist", label: "Minimalist (5)" },
-                  { id: "Earth & Nature", label: "Nature (6)" },
-                  { id: "Scholarly Night", label: "🌙 Dark (8)" },
+                  { id: "all", label: `All (${themeList.length})` },
+                  { id: "pinned", label: `📌 Pinned (${themeList.filter((t) => t.isPinned).length})` },
+                  { id: "Archival & Editorial", label: `Archival (${themeList.filter((t) => t.category === "Archival & Editorial").length})` },
+                  { id: "Prestigious Universities", label: `Universities (${themeList.filter((t) => t.category === "Prestigious Universities").length})` },
+                  { id: "Modern Minimalist", label: `Minimalist (${themeList.filter((t) => t.category === "Modern Minimalist").length})` },
+                  { id: "Earth & Nature", label: `Nature (${themeList.filter((t) => t.category === "Earth & Nature").length})` },
+                  { id: "Scholarly Night", label: `🌙 Dark (${themeList.filter((t) => t.category === "Scholarly Night").length})` },
                 ].map((f) => (
                   <button
                     key={f.id}
