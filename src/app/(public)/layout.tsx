@@ -36,6 +36,7 @@ export default async function PublicLayout({
               --accent-primary: ${activeTheme.cssVars.accentPrimary};
               --accent-hover: ${activeTheme.cssVars.accentHover};
               --accent-subtle: ${activeTheme.cssVars.accentSubtle};
+              --accent-text: ${activeTheme.cssVars.accentText || activeTheme.cssVars.accentPrimary};
               --badge-bg: ${activeTheme.cssVars.badgeBg};
               --badge-text: ${activeTheme.cssVars.badgeText};
               --font-heading: ${activeFont.headingFont};

@@ -56,7 +56,7 @@ export default function Hero({
 
               {/* Status Badge */}
               <div className="mt-3 flex items-center justify-center lg:justify-start gap-1.5 text-xs theme-badge px-3 py-1.5 rounded-full border shadow-xs w-fit mx-auto lg:mx-0">
-                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: "var(--accent-primary)" }}></span>
+                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: "var(--accent-text, var(--accent-primary))" }}></span>
                 <span className="font-medium">Faculty Member • IIT Indore</span>
               </div>
             </div>
@@ -69,7 +69,7 @@ export default function Hero({
                 {name}
               </h1>
 
-              <p className="text-base sm:text-xl font-medium" style={{ color: "var(--accent-primary)" }}>
+              <p className="text-base sm:text-xl font-medium" style={{ color: "var(--accent-text, var(--accent-primary))" }}>
                 {designation}
               </p>
 
