@@ -54,7 +54,7 @@ export default function ResearchCard({
             {keywordList.map((kw, idx) => (
               <span
                 key={idx}
-                className="px-2.5 py-0.5 text-xs font-medium rounded-md bg-slate-100 text-slate-700 border border-slate-200/60"
+                className="px-2.5 py-0.5 text-xs font-medium rounded-md theme-badge border"
               >
                 {kw}
               </span>

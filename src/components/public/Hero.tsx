@@ -55,8 +55,8 @@ export default function Hero({
               </div>
 
               {/* Status Badge */}
-              <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-600 bg-white/90 px-3 py-1.5 rounded-full border border-slate-200 shadow-xs w-fit">
-                <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
+              <div className="mt-3 flex items-center gap-1.5 text-xs theme-badge px-3 py-1.5 rounded-full border shadow-xs w-fit">
+                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: "var(--accent-primary)" }}></span>
                 <span className="font-medium">Faculty Member • IIT Indore</span>
               </div>
             </div>
@@ -65,48 +65,43 @@ export default function Hero({
           {/* Academic Info & Summary (Column 2) */}
           <div className="lg:col-span-8 space-y-6 text-center lg:text-left">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-slate-100 text-slate-800 text-xs font-semibold uppercase tracking-wider">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
-                <span>Academic Profile</span>
-              </div>
-
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight" style={{ color: "var(--text-main)" }}>
                 {name}
               </h1>
 
-              <p className="text-lg sm:text-xl font-medium text-emerald-800">
+              <p className="text-lg sm:text-xl font-medium" style={{ color: "var(--accent-primary)" }}>
                 {designation}
               </p>
 
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-y-1 gap-x-4 text-sm text-slate-600">
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-y-1 gap-x-4 text-sm" style={{ color: "var(--text-muted)" }}>
                 <div className="flex items-center gap-1.5">
-                  <Building className="w-4 h-4 text-slate-400" />
+                  <Building className="w-4 h-4 opacity-70" />
                   <span>{department}</span>
                 </div>
-                <span className="text-slate-300 hidden sm:inline">•</span>
+                <span className="opacity-40 hidden sm:inline">•</span>
                 <div className="flex items-center gap-1.5">
-                  <MapPin className="w-4 h-4 text-slate-400" />
-                  <span className="font-semibold text-slate-700">{institution}</span>
+                  <MapPin className="w-4 h-4 opacity-70" />
+                  <span className="font-semibold" style={{ color: "var(--text-main)" }}>{institution}</span>
                 </div>
               </div>
             </div>
 
             {/* Short Bio */}
-            <p className="text-base sm:text-lg text-slate-700 leading-relaxed max-w-3xl">
+            <p className="text-base sm:text-lg leading-relaxed max-w-3xl opacity-90" style={{ color: "var(--text-main)" }}>
               {shortBio}
             </p>
 
             {/* Research Keywords */}
             {interestsList.length > 0 && (
               <div className="space-y-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
+                <span className="text-xs font-bold uppercase tracking-wider block" style={{ color: "var(--text-muted)" }}>
                   Primary Research Disciplines:
                 </span>
                 <div className="flex flex-wrap justify-center lg:justify-start gap-1.5">
                   {interestsList.map((interest, idx) => (
                     <span
                       key={idx}
-                      className="px-2.5 py-1 text-xs font-medium rounded-md bg-slate-100 text-slate-800 border border-slate-200/60"
+                      className="px-2.5 py-1 text-xs font-medium rounded-md theme-badge border"
                     >
                       {interest}
                     </span>
@@ -119,7 +114,7 @@ export default function Hero({
             <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-3">
               <Link
                 href="/research"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-lg shadow-sm hover:shadow transition-all hero-primary-btn"
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-white text-sm font-semibold rounded-lg shadow-sm hover:shadow transition-all hero-primary-btn"
               >
                 <span>Explore Research</span>
                 <ArrowRight className="w-4 h-4" />
@@ -130,16 +125,17 @@ export default function Hero({
                   href={cvUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-lg border border-slate-300 shadow-xs hover:border-slate-400 transition-all"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg border shadow-xs transition-all hero-secondary-btn"
                 >
-                  <Download className="w-4 h-4 text-slate-500" />
+                  <Download className="w-4 h-4" />
                   <span>Curriculum Vitae</span>
                 </a>
               )}
 
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 px-4 py-2.5 text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors hover:opacity-100 opacity-80"
+                style={{ color: "var(--text-main)" }}
               >
                 <Mail className="w-4 h-4" />
                 <span>Contact Lab</span>
