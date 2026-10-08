@@ -53,8 +53,8 @@ export default async function HomePage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-16 lg:space-y-20">
         {/* 2. About Me Snippet */}
-        <section className="bg-white p-8 sm:p-10 rounded-2xl border border-slate-200/90 shadow-xs">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <section className="bg-white p-5 sm:p-8 lg:p-10 rounded-2xl border border-slate-200/90 shadow-xs">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
             <div className="lg:col-span-4">
               <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
                 Academic Background

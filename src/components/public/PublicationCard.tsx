@@ -146,10 +146,10 @@ export default function PublicationCard({ publication }: PublicationCardProps) {
               href={`https://doi.org/${publication.doi}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-semibold text-slate-700 hover:text-emerald-800 transition-colors"
+              className="inline-flex items-center gap-1 font-semibold text-slate-700 hover:text-emerald-800 transition-colors max-w-full"
             >
-              <ExternalLink className="w-3.5 h-3.5" />
-              <span>DOI: {publication.doi}</span>
+              <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate max-w-[200px] sm:max-w-none">DOI: {publication.doi}</span>
             </a>
           )}
 

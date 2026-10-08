@@ -554,6 +554,33 @@ export const ACADEMIC_THEMES: Record<string, ThemeDefinition> = {
       badgeText: "#fbbf24",
     },
   },
+
+  // ==========================================
+  // 5. Scholarly Night & Dark Modes (7 Themes)
+  // ==========================================
+  "dark-slate-white": {
+    id: "dark-slate-white",
+    name: "Dark Slate & Pure White",
+    category: "Scholarly Night",
+    isPinned: true,
+    isDark: true,
+    description: "Deep dark charcoal slate canvas with high-contrast pure white typography and modern technical precision.",
+    swatch: { canvas: "#0f172a", card: "#1e293b", accent: "#38bdf8" },
+    fontHeading: "sans",
+    cssVars: {
+      bgCanvas: "#0b1120",
+      bgCard: "#1e293b",
+      bgSubtle: "#151e2e",
+      borderColor: "#334155",
+      textMain: "#ffffff",
+      textMuted: "#94a3b8",
+      accentPrimary: "#38bdf8",
+      accentHover: "#0ea5e9",
+      accentSubtle: "rgba(56, 189, 248, 0.15)",
+      badgeBg: "rgba(255, 255, 255, 0.12)",
+      badgeText: "#ffffff",
+    },
+  },
   "deep-navy-champagne": {
     id: "deep-navy-champagne",
     name: "Royal Navy & Champagne Gold",
